@@ -1,5 +1,5 @@
 import { useField } from 'formik'
-import { tailWindCss } from '../../tailwindcss'
+import { tailWindCss } from '../tailwindcss'
 
 import React from 'react'
 

@@ -1,10 +1,13 @@
 import { useField } from 'formik'
-import { tailWindCss } from '../../tailwindcss'
+import { tailWindCss } from '../tailwindcss'
 
 import React from 'react'
 
 const CustomInput = ({ label, ...props }) => {
     const [field, meta] = useField(props)
+
+    
+    
     return (
         <>
             <label>{label}</label>

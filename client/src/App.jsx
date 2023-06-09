@@ -10,6 +10,7 @@ import Registration from './pages/Registration'
 import { useSelector } from 'react-redux'
 import Login from './pages/Login'
 import CreateProduct from './pages/CreateProduct'
+import Invoice from './pages/Invoice'
 
 function App() {
     const isAuth = Boolean(useSelector((state) => state.token))
@@ -25,6 +26,7 @@ function App() {
                         path='/register/product'
                         element={<CreateProduct />}
                     />
+                    <Route path='/create/invoice' element={<Invoice/>}/>
                     <Route path='/register/user' element={<Registration />} />
                 </Routes>
             </BrowserRouter>

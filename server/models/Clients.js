@@ -19,7 +19,6 @@ const clientSchema = mongoose.Schema(
             type: String,
             required: true
         },
-        products: [{ type: Schema.Types.ObjectId, ref: 'products' }],
         invoice: [{ type: Schema.Types.ObjectId, ref: 'invoice' }]
     },
     { timestamps: true }

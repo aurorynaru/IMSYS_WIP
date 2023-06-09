@@ -54,10 +54,13 @@ const invoiceSchema = mongoose.Schema(
             type: Schema.Types.ObjectId,
             ref: 'users'
         },
+        delivery_receipt:{
+            type:Schema.Types.ObjectId, ref: 'delivery_receipts'
+        },
         edited_by: [{ type: Schema.Types.ObjectId, ref: 'users', default: [] }],
         status: {
             type: String,
-            enum: ['Paid', 'Pending', 'Pending Override', 'Returned'],
+            enum: ['Paid', 'Pending', 'Pending Override', 'Returned','Cancelled', 'To follow'],
             default: 'Pending'
         }
     },
