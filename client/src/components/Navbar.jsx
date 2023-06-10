@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Fragment, useRef } from 'react'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { setLogOut } from '../state/index.js'
 import { textBlack } from '../tailwindcss.js'
+import { Menu, Transition } from '@headlessui/react'
+import { ChevronDownIcon } from '@heroicons/react/20/solid'
 const Navbar = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -65,9 +67,9 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className='navbar flex w-full items-center  bg-neutral bg-opacity-50 px-16 py-5 '>
+            <nav className='navbar flex w-full items-center  bg-neutral  px-16 py-5 '>
                 <div className='navbar-start  ' onClick={() => navigate('/')}>
-                    <h1 className='cursor-pointer  text-4xl font-medium '>
+                    <h1 className='cursor-pointer  text-4xl font-medium text-primary '>
                         TEST
                     </h1>
                 </div>
@@ -76,25 +78,103 @@ const Navbar = () => {
                     {isAuth ? (
                         <>
                             <div className='mx-10 flex items-center justify-center'>
-                                <div className='dropdown'>
-                                    <label
-                                        tabIndex={0}
-                                        className='m-1 text-lg font-bold  transition-colors duration-300  hover:text-primary'
+                                <Menu
+                                    as='div'
+                                    className='relative inline-block  text-left'
+                                >
+                                    <div className='text-primary hover:text-accent active:text-accent'>
+                                        <Menu.Button className='inline-flex w-full justify-center rounded-md px-4 py-2 text-lg  font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-opacity-75'>
+                                            Options
+                                            <ChevronDownIcon
+                                                className=' m-auto -mr-1 ml-2 h-5 w-5 '
+                                                aria-hidden='true'
+                                            />
+                                        </Menu.Button>
+                                    </div>
+                                    <Transition
+                                        as={Fragment}
+                                        enter='transition ease-out duration-100'
+                                        enterFrom='transform opacity-0 scale-95'
+                                        enterTo='transform opacity-100 scale-100'
+                                        leave='transition ease-in duration-75'
+                                        leaveFrom='transform opacity-100 scale-100'
+                                        leaveTo='transform opacity-0 scale-95'
                                     >
-                                        Products
-                                    </label>
-                                    <ul
-                                        tabIndex={0}
-                                        className='dropdown-content menu rounded-box w-52 bg-base-100 p-2 shadow'
-                                    >
-                                        <li>
-                                            <a>Item 1</a>
-                                        </li>
-                                        <li>
-                                            <a>Item 2</a>
-                                        </li>
-                                    </ul>
-                                </div>
+                                        <Menu.Items className='absolute right-0 mt-2 w-56 origin-top-right divide-y divide-base-300 rounded-md bg-base-200 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+                                            <div className='px-1 py-1 '>
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <button
+                                                            className={`${
+                                                                active
+                                                                    ? 'bg-secondary text-accent'
+                                                                    : 'text-base-content'
+                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                    )}
+                                                </Menu.Item>
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <button
+                                                            className={`${
+                                                                active
+                                                                    ? 'bg-secondary text-accent'
+                                                                    : 'text-base-content'
+                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                                        >
+                                                            Duplicate
+                                                        </button>
+                                                    )}
+                                                </Menu.Item>
+                                            </div>
+                                            <div className='px-1 py-1'>
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <button
+                                                            className={`${
+                                                                active
+                                                                    ? 'bg-secondary text-accent'
+                                                                    : 'text-base-content'
+                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                                        >
+                                                            Archive
+                                                        </button>
+                                                    )}
+                                                </Menu.Item>
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <button
+                                                            className={`${
+                                                                active
+                                                                    ? 'bg-secondary text-accent'
+                                                                    : 'text-base-content'
+                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                                        >
+                                                            Move
+                                                        </button>
+                                                    )}
+                                                </Menu.Item>
+                                            </div>
+                                            <div className='px-1 py-1'>
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <button
+                                                            className={`${
+                                                                active
+                                                                    ? 'bg-secondary text-accent'
+                                                                    : 'text-base-content'
+                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    )}
+                                                </Menu.Item>
+                                            </div>
+                                        </Menu.Items>
+                                    </Transition>
+                                </Menu>
                             </div>
                             <div className=' flex transform gap-4 px-5 duration-500 hover:translate-y-[-5px]'>
                                 <button
@@ -130,14 +210,14 @@ const Navbar = () => {
                     <select
                         value={selectedValue}
                         onChange={handleChange}
-                        className='select-secondary select '
+                        className='select-primary select '
                     >
                         <option disabled selected>
                             Pick a theme
                         </option>
+
                         <option>light</option>
                         <option>dark</option>
-                        <option>night</option>
                         <option>themeA</option>
                     </select>
                 </div>

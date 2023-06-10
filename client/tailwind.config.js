@@ -3,15 +3,38 @@ export default {
     content: ['./src/**/*.{js,jsx,ts,tsx}', './index.html'],
     daisyui: {
         themes: [
-            'light',
-            'dark',
-            'night',
+            {
+                light: {
+                    primary: '#111827',
+                    secondary: '#d1d5db',
+                    accent: '#8000b6',
+                    neutral: '#EFF309',
+                    'base-100': '#f3f4f6',
+                    info: '#fdd85d',
+                    success: '#22c55e',
+                    warning: '#f87171',
+                    error: '#e11d48'
+                }
+            },
+            {
+                dark: {
+                    primary: '#f3f4f6',
+                    secondary: '#4b5563',
+                    accent: '#EFF309',
+                    neutral: '#8000b6',
+                    'base-100': '#111827',
+                    info: '#fdd85d',
+                    success: '#22c55e',
+                    warning: '#f87171',
+                    error: '#e11d48'
+                }
+            },
 
             {
                 themeA: {
                     primary: '#fdd85d',
-                    secondary: '#fdc921',
-                    accent: '#99d6ea',
+                    secondary: '#99d6ea',
+                    accent: '#FFE695',
                     neutral: '#6798c0',
                     'base-100': '#fffdf7',
                     info: '#fdd85d',
