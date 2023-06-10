@@ -16,7 +16,7 @@ function App() {
     const isAuth = Boolean(useSelector((state) => state.token))
 
     return (
-        <div className=' bg-neutral-100-100 min-h-screen text-neutral-900 transition duration-500 ease-in-out dark:bg-body dark:text-neutral-100'>
+        <div className=' bg-base-100 min-h-screen transition duration-500 ease-in-out'>
             <BrowserRouter>
                 <Routes>
                     <Route path='/' element={<Navigate to='/home' />} />
@@ -26,7 +26,7 @@ function App() {
                         path='/register/product'
                         element={<CreateProduct />}
                     />
-                    <Route path='/create/invoice' element={<Invoice/>}/>
+                    <Route path='/create/invoice' element={<Invoice />} />
                     <Route path='/register/user' element={<Registration />} />
                 </Routes>
             </BrowserRouter>
