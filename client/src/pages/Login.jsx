@@ -68,13 +68,13 @@ const Login = () => {
                     <Form
                         autoComplete='off'
                         onSubmit={handleSubmit}
-                        className='mx-auto mt-10 flex w-1/3  flex-col gap-1 rounded-md pt-5 shadow-lg '
+                        className='mx-auto mt-10 flex w-1/3  flex-col gap-1 rounded-md pt-5 bg-base-200 shadow-lg '
                     >
                         {console.log(errors)}
                         <div className='flex flex-col gap-3 px-2 '>
                             <div className='flex flex-col text-black'>
                                 <label
-                                    className='text-sm font-semibold'
+                                    className='text-sm text-primary-focus  font-semibold'
                                     htmlFor='username'
                                 >
                                     Username
@@ -97,7 +97,7 @@ const Login = () => {
 
                             <div className='flex flex-col text-black'>
                                 <label
-                                    className='text-sm font-semibold'
+                                    className='text-sm  text-primary-focus font-semibold'
                                     htmlFor='password'
                                 >
                                     Password
