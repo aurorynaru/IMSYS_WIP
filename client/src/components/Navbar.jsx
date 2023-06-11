@@ -69,13 +69,13 @@ const Navbar = () => {
         <>
             <nav className='navbar flex max-w-full items-center  bg-neutral  px-5 py-5 '>
                 <div className='navbar-start gap-2  ' onClick={() => navigate('/')}>
-                    <h1 className='cursor-pointer  text-md font-medium text-primary '>
+                    <h1 className='cursor-pointer  text-md font-medium text-accent'>
                         TEST
                     </h1>
-                    <h1 className='cursor-pointer  text-md font-medium text-primary '>
+                    <h1 className='cursor-pointer  text-md font-medium text-accent'>
                         TESTING
                     </h1>
-                    <h1 className='cursor-pointer  text-md font-medium text-primary '>
+                    <h1 className='cursor-pointer  text-md font-medium text-accent'>
                         TEST
                     </h1>
                 </div>
@@ -364,10 +364,10 @@ const Navbar = () => {
                             </div>  
                             </div>
                     ) : (
-                        <div className='flex items-center'>
+                        <div className='navbar-end gap-3'>
                             <div className='transform duration-500 hover:translate-y-[-5px]'>
                                 <button
-                                    className='btn-primary btn rounded-md border-none border-transparent text-base'
+                                    className='btn-secondary btn btn-sm whitespace-nowrap'
                                     onClick={() => navigate('/register/user')}
                                 >
                                     Register user
@@ -375,18 +375,18 @@ const Navbar = () => {
                             </div>
                             <div className='transform  duration-500 hover:translate-y-[-5px]'>
                                 <button
-                                    className='rounded-md border-none border-transparent bg-dark px-4 py-2 text-sm font-medium text-white-blue '
+                                    className='btn btn-primary btn-sm whitespace-nowrap'
                                     onClick={() => navigate('/login')}
                                 >
                                     Sign In
                                 </button>
                             </div>
 
-                            <div className="mx-5">
+                            <div className="">
                     <select
                         value={selectedValue}
                         onChange={handleChange}
-                        className='select-primary select '
+                        className='select-primary select select-sm '
                     >
                         <option disabled selected>
                             Pick a theme
