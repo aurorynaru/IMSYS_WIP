@@ -97,7 +97,7 @@ const Login = () => {
 
                             <div className='flex flex-col text-black trac'>
                                 <label
-                                    className='text-sm  text-neutral  font-semibold'
+                                    className='text-sm text-neutral font-semibold'
                                     htmlFor='password'
                                 >
                                     Password
