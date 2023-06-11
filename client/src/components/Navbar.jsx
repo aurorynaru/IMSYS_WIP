@@ -338,7 +338,7 @@ const Navbar = () => {
                             </div>
                         <div className="navbar-end flex">
                     <select
-                        value={selectedValue}
+                        value={savedTheme}
                         onChange={handleChange}
                         className='select-primary select select-sm '
                     >
@@ -384,7 +384,7 @@ const Navbar = () => {
 
                             <div className="">
                     <select
-                        value={selectedValue}
+                        value={savedTheme}
                         onChange={handleChange}
                         className='select-primary select select-sm '
                     >

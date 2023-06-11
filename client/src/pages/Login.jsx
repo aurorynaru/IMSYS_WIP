@@ -68,7 +68,7 @@ const Login = () => {
                     <Form
                         autoComplete='off'
                         onSubmit={handleSubmit}
-                        className='mx-auto mt-10 flex w-1/3  flex-col gap-1 rounded-md pt-5 bg-base-300 shadow-lg '
+                        className='mx-auto my-5 flex w-1/3 flex-col gap-1 rounded-md pt-5 bg-base-300 shadow-lg '
                     >
                         {console.log(errors)}
                         <div className='flex flex-col gap-3 px-2 '>

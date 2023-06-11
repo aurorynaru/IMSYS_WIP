@@ -111,13 +111,13 @@ const Registration = () => {
                     <Form
                         autoComplete='off'
                         onSubmit={handleSubmit}
-                        className='mx-auto mt-10 flex   w-1/3 flex-col gap-3 rounded-md bg-body pt-5 shadow-lg'
+                        className='mx-auto my-5 flex w-1/3 flex-col gap-3 rounded-md bg-base-300  pt-5 shadow-lg'
                     >
                         {console.log(errors)}
                         <div className='flex flex-col gap-1 px-2 '>
                             <div className='flex flex-col '>
                                 <label
-                                    className={`text-sm font-semibold ${textBlack}`}
+                                    className={`text-sm font-semibold text-neutral`}
                                     htmlFor='username'
                                 >
                                     Username
@@ -140,7 +140,7 @@ const Registration = () => {
 
                             <div className='flex flex-col '>
                                 <label
-                                    className={`text-sm font-semibold ${textBlack}`}
+                                    className={`text-sm font-semibold text-neutral`}
                                     htmlFor='first_name'
                                 >
                                     First Name
@@ -166,7 +166,7 @@ const Registration = () => {
 
                             <div className='flex flex-col '>
                                 <label
-                                    className={`text-sm font-semibold ${textBlack}`}
+                                    className={`text-sm font-semibold text-neutral`}
                                     htmlFor='last_name'
                                 >
                                     Last Name
@@ -189,7 +189,7 @@ const Registration = () => {
 
                             <div className='flex flex-col '>
                                 <label
-                                    className={`text-sm font-semibold ${textBlack}`}
+                                    className={`text-sm font-semibold text-neutral`}
                                     htmlFor='password'
                                 >
                                     Password
@@ -213,7 +213,7 @@ const Registration = () => {
 
                             <div className='flex flex-col '>
                                 <label
-                                    className={`text-sm font-semibold ${textBlack}`}
+                                    className={`text-sm font-semibold text-neutral`}
                                     htmlFor='confirmPassword'
                                 >
                                     Confirm Password
