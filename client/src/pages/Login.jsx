@@ -68,13 +68,13 @@ const Login = () => {
                     <Form
                         autoComplete='off'
                         onSubmit={handleSubmit}
-                        className='mx-auto mt-10 flex w-1/3  flex-col gap-1 rounded-md pt-5 bg-base-200 shadow-lg '
+                        className='mx-auto mt-10 flex w-1/3  flex-col gap-1 rounded-md pt-5 bg-base-300 shadow-lg '
                     >
                         {console.log(errors)}
                         <div className='flex flex-col gap-3 px-2 '>
-                            <div className='flex flex-col text-black'>
+                            <div className='flex flex-col text-black '>
                                 <label
-                                    className='text-sm text-primary-focus  font-semibold'
+                                    className='text-sm text-neutral font-semibold'
                                     htmlFor='username'
                                 >
                                     Username
@@ -85,7 +85,7 @@ const Login = () => {
                                         errors.username && touched.username
                                             ? ` border-red-500 focus:ring-red-500`
                                             : ''
-                                    }`}
+                                 }`}
                                     value={values.username}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -95,9 +95,9 @@ const Login = () => {
                                 {errorText(errors.username, touched.username)}
                             </div>
 
-                            <div className='flex flex-col text-black'>
+                            <div className='flex flex-col text-black trac'>
                                 <label
-                                    className='text-sm  text-primary-focus font-semibold'
+                                    className='text-sm  text-neutral  font-semibold'
                                     htmlFor='password'
                                 >
                                     Password
