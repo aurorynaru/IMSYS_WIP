@@ -111,7 +111,7 @@ const Registration = () => {
                     <Form
                         autoComplete='off'
                         onSubmit={handleSubmit}
-                        className='mx-auto my-5 flex w-1/3 flex-col gap-3 rounded-md bg-base-300  pt-5 shadow-lg'
+                        className='mx-auto my-5 flex w-1/3 flex-col gap-3 rounded-md border-[2px] border-gray-600 bg-secondary  pt-5 shadow-lg'
                     >
                         {console.log(errors)}
                         <div className='flex flex-col gap-1 px-2 '>
@@ -124,7 +124,7 @@ const Registration = () => {
                                 </label>
 
                                 <input
-                                    className={`${tailWindCss} ${
+                                    className={` input-primary input input-sm rounded-sm text-primary ${
                                         errors.username && touched.username
                                             ? ` border-red-500 focus:ring-red-500`
                                             : ''
@@ -147,7 +147,7 @@ const Registration = () => {
                                 </label>
 
                                 <input
-                                    className={`${tailWindCss} ${
+                                    className={` input-primary input input-sm rounded-sm text-primary ${
                                         errors.first_name && touched.first_name
                                             ? ` border-red-500 focus:ring-red-500`
                                             : ''
@@ -173,7 +173,7 @@ const Registration = () => {
                                 </label>
 
                                 <input
-                                    className={`${tailWindCss} ${
+                                    className={` input-primary input input-sm rounded-sm text-primary ${
                                         errors.last_name && touched.last_name
                                             ? ` border-red-500 focus:ring-red-500`
                                             : ''
@@ -196,7 +196,7 @@ const Registration = () => {
                                 </label>
 
                                 <input
-                                    className={`${tailWindCss} ${
+                                    className={` input-primary input input-sm rounded-sm text-primary ${
                                         errors.password && touched.password
                                             ? ' border-red-500 focus:ring-red-500'
                                             : ''
@@ -220,7 +220,7 @@ const Registration = () => {
                                 </label>
 
                                 <input
-                                    className={`${tailWindCss} ${
+                                    className={` input-primary input input-sm rounded-sm text-primary ${
                                         errors.confirmPassword &&
                                         touched.confirmPassword
                                             ? ' border-red-500 focus:ring-red-500'
@@ -244,9 +244,9 @@ const Registration = () => {
                             className='btn2 relative  overflow-hidden rounded-bl-md rounded-br-md border-opacity-50  py-4 font-semibold uppercase leading-none tracking-wider '
                             type='submit'
                         >
-                            <span className='bg-green-light absolute inset-0  bg-blue-light'></span>
+                            <span className='bg-green-light absolute inset-0 bg-neutral'></span>
                             <span
-                                className={`absolute inset-0 flex items-center  justify-center ${textBlack}`}
+                                className={`absolute inset-0 flex items-center  justify-center text-primary`}
                             >
                                 Submit
                             </span>

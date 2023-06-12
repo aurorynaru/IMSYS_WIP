@@ -16,7 +16,7 @@ function App() {
     const isAuth = Boolean(useSelector((state) => state.token))
 
     return (
-        <div className=' bg-base-100 min-h-screen transition duration-500 ease-in-out'>
+        <div className='min-h-screen bg-base-100 transition duration-500 ease-in-out'>
             <BrowserRouter>
                 <Routes>
                     <Route path='/' element={<Navigate to='/home' />} />

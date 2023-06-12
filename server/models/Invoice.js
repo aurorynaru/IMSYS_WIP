@@ -11,7 +11,6 @@ const invoiceSchema = mongoose.Schema(
         items: [
             {
                 type: Schema.Types.ObjectId,
-                ref: 'products',
                 required: true
             }
         ],
@@ -25,6 +24,10 @@ const invoiceSchema = mongoose.Schema(
         },
         recipient: {
             type: String
+        },
+        delivery_to: {
+            type: String,
+            required: true
         },
         vatable_sales: {
             type: Number,
@@ -54,13 +57,25 @@ const invoiceSchema = mongoose.Schema(
             type: Schema.Types.ObjectId,
             ref: 'users'
         },
-        delivery_receipt:{
-            type:Schema.Types.ObjectId, ref: 'delivery_receipts'
+        delivery_receipt: {
+            type: Schema.Types.ObjectId,
+            ref: 'delivery_receipts'
         },
         edited_by: [{ type: Schema.Types.ObjectId, ref: 'users', default: [] }],
+        isBeingEdited: {
+            type: Boolean,
+            default: false
+        },
         status: {
             type: String,
-            enum: ['Paid', 'Pending', 'Pending Override', 'Returned','Cancelled', 'To follow'],
+            enum: [
+                'Paid',
+                'Pending',
+                'Pending Override',
+                'Returned',
+                'Cancelled',
+                'To follow'
+            ],
             default: 'Pending'
         }
     },

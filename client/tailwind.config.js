@@ -6,10 +6,10 @@ export default {
             {
                 light: {
                     primary: '#111827',
-                    secondary: '#d1d5db',
-                    accent: '#8000b6',
-                    neutral: '#EFF309',
-                    'base-100': '#f3f4f6',
+                    secondary: '#fffdf7',
+                    accent: '#f4e409',
+                    neutral: '#8000b6',
+                    'base-100': '#fffdf7',
                     info: '#fdd85d',
                     success: '#22c55e',
                     warning: '#f87171',
@@ -19,10 +19,10 @@ export default {
             {
                 dark: {
                     primary: '#f3f4f6',
-                    secondary: '#4b5563',
+                    secondary: '#1b1f22',
                     accent: '#EFF309',
                     neutral: '#8000b6',
-                    'base-100': '#111827',
+                    'base-100': '#212529',
                     info: '#fdd85d',
                     success: '#22c55e',
                     warning: '#f87171',
@@ -32,13 +32,13 @@ export default {
 
             {
                 themeA: {
-                    primary: '#fdd85d',
-                    secondary: '#99d6ea',
-                    accent: '#FFE695',
-                    neutral: '#6798c0',
+                    primary: '#111827',
+                    secondary: '#fffdf7',
+                    accent: '#fdd85d',
+                    neutral: '#99d6ea',
                     'base-100': '#fffdf7',
                     info: '#fdd85d',
-                    success: '#99d6ea',
+                    success: '#22c55e',
                     warning: '#f87171',
                     error: '#e11d48'
                 }
