@@ -88,7 +88,7 @@ const Navbar = () => {
                         <div className='flex items-center justify-center'>
                             <Menu
                                 as='div'
-                                className='relative inline-block  text-left'
+                                className='relative z-10  inline-block text-left'
                             >
                                 <div className='text-primary hover:text-accent active:text-accent'>
                                     <Menu.Button className='inline-flex w-full justify-center rounded-md px-4 py-2  font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-opacity-75'>
@@ -126,6 +126,11 @@ const Navbar = () => {
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <button
+                                                        onClick={() => {
+                                                            navigate(
+                                                                '/register/product'
+                                                            )
+                                                        }}
                                                         className={`${
                                                             active
                                                                 ? ' bg-neutral text-accent'
@@ -264,6 +269,11 @@ const Navbar = () => {
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <button
+                                                        onClick={() => {
+                                                            navigate(
+                                                                '/register/client/'
+                                                            )
+                                                        }}
                                                         className={`${
                                                             active
                                                                 ? ' bg-neutral text-accent'
@@ -335,11 +345,11 @@ const Navbar = () => {
                         </div>
                         <div className='navbar-end flex'>
                             <select
-                                value={savedTheme}
+                                value={savedTheme || 'light'}
                                 onChange={handleChange}
                                 className='select-primary select select-sm '
                             >
-                                <option disabled selected>
+                                <option disabled value=''>
                                     Pick a theme
                                 </option>
 
@@ -381,11 +391,11 @@ const Navbar = () => {
 
                         <div className=''>
                             <select
-                                value={savedTheme}
+                                value={savedTheme || 'light'}
                                 onChange={handleChange}
                                 className='select-primary select select-sm '
                             >
-                                <option disabled selected>
+                                <option disabled value=''>
                                     Pick a theme
                                 </option>
 

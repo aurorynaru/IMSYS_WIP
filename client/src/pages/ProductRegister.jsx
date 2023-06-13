@@ -9,7 +9,7 @@ import Navbar from '../components/Navbar'
 import { useDispatch } from 'react-redux'
 import { generateCustomID } from '../functions/randomID'
 
-const CreateProduct = () => {
+const ProductRegister = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [inputPrice, setInputPrice] = useState('')
@@ -104,21 +104,21 @@ const CreateProduct = () => {
                     <Form
                         autoComplete='off'
                         onSubmit={handleSubmit}
-                        className='mx-auto mt-10 flex   w-1/3 flex-col gap-3 rounded-md bg-body pt-5 shadow-lg'
+                        className='mx-auto my-5 flex w-1/3 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-5 shadow-lg'
                     >
                         {console.log(errors)}
                         <div className='flex flex-col gap-1 px-2 '>
                             <div className='flex flex-col '>
                                 <label
-                                    className={`text-sm font-semibold ${textBlack}`}
+                                    className='text-sm font-semibold text-neutral'
                                     htmlFor='brand'
                                 >
                                     Brand Name
                                 </label>
 
                                 <input
-                                    className={`${tailWindCss} ${
-                                        errors.brand && touched.brand
+                                    className={` input-primary input input-sm rounded-sm text-primary ${
+                                        errors.name && touched.name
                                             ? ` border-red-500 focus:ring-red-500`
                                             : ''
                                     }`}
@@ -132,19 +132,18 @@ const CreateProduct = () => {
                             </div>
                             <div className='flex flex-col '>
                                 <label
-                                    className={`text-sm font-semibold ${textBlack}`}
+                                    className='text-sm font-semibold text-neutral'
                                     htmlFor='purchased_from'
                                 >
                                     Purchased From
                                 </label>
 
                                 <input
-                                    className={`${tailWindCss} ${
-                                        errors.purchased_from &&
-                                        touched.purchased_from
-                                            ? ' border-red-500 focus:ring-red-500'
+                                    className={` input-primary input input-sm rounded-sm text-primary ${
+                                        errors.name && touched.name
+                                            ? ` border-red-500 focus:ring-red-500`
                                             : ''
-                                    } `}
+                                    }`}
                                     value={values.purchased_from}
                                     onChange={handleChange}
                                     id='purchased_from'
@@ -159,16 +158,15 @@ const CreateProduct = () => {
 
                             <div className='flex flex-col '>
                                 <label
-                                    className={`text-sm font-semibold ${textBlack}`}
+                                    className='text-sm font-semibold text-neutral'
                                     htmlFor='description'
                                 >
                                     Item Description
                                 </label>
 
                                 <input
-                                    className={`${tailWindCss} ${
-                                        errors.description &&
-                                        touched.description
+                                    className={` input-primary input input-sm rounded-sm text-primary ${
+                                        errors.name && touched.name
                                             ? ` border-red-500 focus:ring-red-500`
                                             : ''
                                     }`}
@@ -186,15 +184,15 @@ const CreateProduct = () => {
 
                             <div className='flex flex-col '>
                                 <label
-                                    className={`text-sm font-semibold ${textBlack}`}
+                                    className='text-sm font-semibold text-neutral'
                                     htmlFor='price'
                                 >
                                     Price
                                 </label>
 
                                 <input
-                                    className={`${tailWindCss} ${
-                                        errors.price && touched.price
+                                    className={` input-primary input input-sm rounded-sm text-primary ${
+                                        errors.name && touched.name
                                             ? ` border-red-500 focus:ring-red-500`
                                             : ''
                                     }`}
@@ -210,18 +208,18 @@ const CreateProduct = () => {
 
                             <div className='flex flex-col '>
                                 <label
-                                    className={`text-sm font-semibold ${textBlack}`}
+                                    className='text-sm font-semibold text-neutral'
                                     htmlFor='quantity'
                                 >
                                     Quantity
                                 </label>
 
                                 <input
-                                    className={`${tailWindCss} ${
-                                        errors.quantity && touched.quantity
-                                            ? ' border-red-500 focus:ring-red-500'
+                                    className={` input-primary input input-sm rounded-sm text-primary ${
+                                        errors.name && touched.name
+                                            ? ` border-red-500 focus:ring-red-500`
                                             : ''
-                                    } `}
+                                    }`}
                                     value={values.quantity}
                                     onChange={handleChange}
                                     id='quantity'
@@ -231,9 +229,7 @@ const CreateProduct = () => {
                                 {errorText(errors.quantity, touched.quantity)}
                             </div>
                             <div className='flex flex-col '>
-                                <label
-                                    className={`text-sm font-semibold ${textBlack}`}
-                                >
+                                <label className='text-sm font-semibold text-neutral'>
                                     Custom ID
                                 </label>
 
@@ -244,13 +240,11 @@ const CreateProduct = () => {
                         </div>
 
                         <button
-                            className='btn2 relative  overflow-hidden rounded-bl-md rounded-br-md border-opacity-50  py-4 font-semibold uppercase leading-none tracking-wider '
+                            className='btn2 relative overflow-hidden rounded-bl-md rounded-br-md border-opacity-50  py-4 font-semibold uppercase leading-none tracking-wider'
                             type='submit'
                         >
-                            <span className='bg-green-light absolute inset-0  bg-blue-light'></span>
-                            <span
-                                className={`absolute inset-0 flex items-center  justify-center ${textBlack}`}
-                            >
+                            <span className='absolute inset-0 bg-neutral '></span>
+                            <span className='absolute inset-0 flex items-center  justify-center text-primary'>
                                 Submit
                             </span>
                             Submit
@@ -262,4 +256,4 @@ const CreateProduct = () => {
     )
 }
 
-export default CreateProduct
+export default ProductRegister

@@ -28,7 +28,15 @@ const productsSchema = mongoose.Schema(
             type: Number,
             required: true
         },
-
+        isBeingEdited: {
+            type: Boolean,
+            default: false
+        },
+        editedBy: [
+            {
+                type: Schema.Types.ObjectId
+            }
+        ],
         custom_id: {
             type: String,
             required: true

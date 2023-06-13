@@ -9,8 +9,9 @@ import Home from './pages/Home'
 import Registration from './pages/Registration'
 import { useSelector } from 'react-redux'
 import Login from './pages/Login'
-import CreateProduct from './pages/CreateProduct'
 import Invoice from './pages/Invoice'
+import ProductRegister from './pages/ProductRegister'
+import ClientRegister from './pages/ClientRegister'
 
 function App() {
     const isAuth = Boolean(useSelector((state) => state.token))
@@ -24,10 +25,14 @@ function App() {
                     <Route path='/login' element={<Login />} />
                     <Route
                         path='/register/product'
-                        element={<CreateProduct />}
+                        element={<ProductRegister />}
                     />
                     <Route path='/create/invoice' element={<Invoice />} />
                     <Route path='/register/user' element={<Registration />} />
+                    <Route
+                        path='/register/Client'
+                        element={<ClientRegister />}
+                    />
                 </Routes>
             </BrowserRouter>
         </div>

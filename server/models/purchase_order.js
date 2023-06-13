@@ -1,25 +1,24 @@
 import mongoose, { Schema } from 'mongoose'
 
-const clientSchema = mongoose.Schema(
+const purchase_order_Schema = mongoose.Schema(
     {
-        name: {
-            type: String,
-            required: true,
-            unique: true
-        },
-        credit_limit: {
-            type: Number,
+        purchase_from: {
+            type: Schema.Types.ObjectId,
             required: true
         },
-        terms: {
-            type: Number,
+        delivered_to: {
+            type: Schema.Types.ObjectId,
             required: true
         },
-        tin: {
+        items: {
             type: String,
             required: true
         },
-        invoice: [{ type: Schema.Types.ObjectId, ref: 'invoice', default: [] }],
+        purchase_order_id: {
+            type: String,
+            required: true
+        },
+
         isBeingEdited: {
             type: Boolean,
             default: false
@@ -33,4 +32,4 @@ const clientSchema = mongoose.Schema(
     { timestamps: true }
 )
 
-export const Client = mongoose.model('clients', clientSchema)
+export const Purchase_order = mongoose.model('users', purchase_order_Schema)
