@@ -10,7 +10,7 @@ import { useDispatch } from 'react-redux'
 import { generateCustomID } from '../functions/randomID'
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
 
-const ClientRegister = () => {
+const SupplierRegister = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [resError, setResError] = useState('')
@@ -130,7 +130,7 @@ const ClientRegister = () => {
                                     className='tooltip flex items-center text-left text-sm font-semibold text-neutral'
                                     htmlFor='terms'
                                 >
-                                    Client Terms
+                                    Supplier Terms
                                     <span
                                         className='tooltip  tooltip-right ml-1'
                                         data-tip='amount in days'
@@ -209,7 +209,7 @@ const ClientRegister = () => {
                                     className='text-sm font-semibold text-neutral'
                                     htmlFor='credit_limit'
                                 >
-                                    Client Address
+                                    Supplier Address
                                 </label>
 
                                 <textarea
@@ -241,9 +241,9 @@ const ClientRegister = () => {
                         >
                             <span className='absolute inset-0 bg-neutral '></span>
                             <span className='absolute inset-0 flex items-center  justify-center text-primary'>
-                                Register Client
+                                Register Supplier
                             </span>
-                            Register Client
+                            Register Supplier
                         </button>
                     </Form>
                 )}
@@ -252,4 +252,4 @@ const ClientRegister = () => {
     )
 }
 
-export default ClientRegister
+export default SupplierRegister

@@ -35,7 +35,7 @@ const Login = () => {
         if (loggedIn.error) {
             setResError(loggedIn.error)
         }
-        console.log(loggedIn)
+
         if (loggedIn) {
             onSubmitProps.resetForm()
             dispatch(

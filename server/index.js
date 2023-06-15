@@ -11,7 +11,7 @@ import morgan from 'morgan'
 import createRoutes from './routes/create.js'
 import registerRoutes from './routes/register.js'
 import authRoutes from './routes/auth.js'
-
+import apiRoutes from './routes/api.js'
 const app = express()
 dotenv.config()
 app.use(cors())
@@ -29,6 +29,7 @@ const PORT = process.env.PORT
 app.use('/', authRoutes)
 app.use('/register', registerRoutes)
 app.use('/create', createRoutes)
+app.use('/api', apiRoutes)
 
 // PORT,'0.0.0.0'
 mongoose

@@ -12,6 +12,7 @@ import Login from './pages/Login'
 import Invoice from './pages/Invoice'
 import ProductRegister from './pages/ProductRegister'
 import ClientRegister from './pages/ClientRegister'
+import SupplierRegister from './pages/SupplierRegister'
 
 function App() {
     const isAuth = Boolean(useSelector((state) => state.token))
@@ -29,6 +30,10 @@ function App() {
                     />
                     <Route path='/create/invoice' element={<Invoice />} />
                     <Route path='/register/user' element={<Registration />} />
+                    <Route
+                        path='/register/supplier'
+                        element={<SupplierRegister />}
+                    />
                     <Route
                         path='/register/Client'
                         element={<ClientRegister />}

@@ -68,10 +68,7 @@ const Navbar = () => {
     return (
         <>
             <nav className='navbar flex max-w-full items-center  bg-neutral  px-5 py-5 shadow-lg '>
-                <div
-                    className='navbar-start gap-2  '
-                    onClick={() => navigate('/')}
-                >
+                <div className='flex-1 gap-2  ' onClick={() => navigate('/')}>
                     <h1 className='text-md  cursor-pointer font-medium text-accent'>
                         TEST
                     </h1>
@@ -84,8 +81,77 @@ const Navbar = () => {
                 </div>
 
                 {isAuth ? (
-                    <div className='navbar-center '>
+                    <div className='flex-1 '>
                         <div className='flex items-center justify-center'>
+                            <Menu
+                                as='div'
+                                className='relative inline-block  text-left'
+                            >
+                                <div className='text-primary hover:text-accent active:text-accent'>
+                                    <Menu.Button className='text-md inline-flex w-full justify-center rounded-md px-4 py-2  font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-opacity-75'>
+                                        Invoice
+                                        <ChevronDownIcon
+                                            className=' m-auto -mr-1 ml-2 h-5 w-5 '
+                                            aria-hidden='true'
+                                        />
+                                    </Menu.Button>
+                                </div>
+                                <Transition
+                                    as={Fragment}
+                                    enter='transition ease-out duration-100'
+                                    enterFrom='transform opacity-0 scale-95'
+                                    enterTo='transform opacity-100 scale-100'
+                                    leave='transition ease-in duration-75'
+                                    leaveFrom='transform opacity-100 scale-100'
+                                    leaveTo='transform opacity-0 scale-95'
+                                >
+                                    <Menu.Items className='absolute right-0 mt-2 w-56 origin-top-right divide-y divide-base-300 rounded-md bg-base-200 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+                                        <div className='px-1 py-1 '>
+                                            <Menu.Item>
+                                                {({ active }) => (
+                                                    <button
+                                                        className={`${
+                                                            active
+                                                                ? ' bg-neutral text-accent'
+                                                                : 'text-primary'
+                                                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                                    >
+                                                        Create Invoice
+                                                    </button>
+                                                )}
+                                            </Menu.Item>
+                                            <Menu.Item>
+                                                {({ active }) => (
+                                                    <button
+                                                        className={`${
+                                                            active
+                                                                ? ' bg-neutral text-accent'
+                                                                : 'text-primary'
+                                                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                                    >
+                                                        Invoice History
+                                                    </button>
+                                                )}
+                                            </Menu.Item>
+                                        </div>
+                                        <div className='px-1 py-1'>
+                                            <Menu.Item>
+                                                {({ active }) => (
+                                                    <button
+                                                        className={`${
+                                                            active
+                                                                ? ' bg-neutral text-accent'
+                                                                : 'text-primary'
+                                                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                                    >
+                                                        Delivery Receipt
+                                                    </button>
+                                                )}
+                                            </Menu.Item>
+                                        </div>
+                                    </Menu.Items>
+                                </Transition>
+                            </Menu>
                             <Menu
                                 as='div'
                                 className='relative z-10  inline-block text-left'
@@ -173,75 +239,7 @@ const Navbar = () => {
                                     </Menu.Items>
                                 </Transition>
                             </Menu>
-                            <Menu
-                                as='div'
-                                className='relative inline-block  text-left'
-                            >
-                                <div className='text-primary hover:text-accent active:text-accent'>
-                                    <Menu.Button className='text-md inline-flex w-full justify-center rounded-md px-4 py-2  font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-opacity-75'>
-                                        Invoice
-                                        <ChevronDownIcon
-                                            className=' m-auto -mr-1 ml-2 h-5 w-5 '
-                                            aria-hidden='true'
-                                        />
-                                    </Menu.Button>
-                                </div>
-                                <Transition
-                                    as={Fragment}
-                                    enter='transition ease-out duration-100'
-                                    enterFrom='transform opacity-0 scale-95'
-                                    enterTo='transform opacity-100 scale-100'
-                                    leave='transition ease-in duration-75'
-                                    leaveFrom='transform opacity-100 scale-100'
-                                    leaveTo='transform opacity-0 scale-95'
-                                >
-                                    <Menu.Items className='absolute right-0 mt-2 w-56 origin-top-right divide-y divide-base-300 rounded-md bg-base-200 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
-                                        <div className='px-1 py-1 '>
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <button
-                                                        className={`${
-                                                            active
-                                                                ? ' bg-neutral text-accent'
-                                                                : 'text-primary'
-                                                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                                                    >
-                                                        Create Invoice
-                                                    </button>
-                                                )}
-                                            </Menu.Item>
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <button
-                                                        className={`${
-                                                            active
-                                                                ? ' bg-neutral text-accent'
-                                                                : 'text-primary'
-                                                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                                                    >
-                                                        Invoice History
-                                                    </button>
-                                                )}
-                                            </Menu.Item>
-                                        </div>
-                                        <div className='px-1 py-1'>
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <button
-                                                        className={`${
-                                                            active
-                                                                ? ' bg-neutral text-accent'
-                                                                : 'text-primary'
-                                                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                                                    >
-                                                        Delivery Receipt
-                                                    </button>
-                                                )}
-                                            </Menu.Item>
-                                        </div>
-                                    </Menu.Items>
-                                </Transition>
-                            </Menu>
+
                             <Menu
                                 as='div'
                                 className='relative inline-block  text-left'
@@ -307,6 +305,65 @@ const Navbar = () => {
                             >
                                 <div className='text-primary hover:text-accent active:text-accent'>
                                     <Menu.Button className='text-md inline-flex w-full justify-center rounded-md px-4 py-2  font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-opacity-75'>
+                                        Supplier
+                                        <ChevronDownIcon
+                                            className=' m-auto -mr-1 ml-2 h-5 w-5 '
+                                            aria-hidden='true'
+                                        />
+                                    </Menu.Button>
+                                </div>
+                                <Transition
+                                    as={Fragment}
+                                    enter='transition ease-out duration-100'
+                                    enterFrom='transform opacity-0 scale-95'
+                                    enterTo='transform opacity-100 scale-100'
+                                    leave='transition ease-in duration-75'
+                                    leaveFrom='transform opacity-100 scale-100'
+                                    leaveTo='transform opacity-0 scale-95'
+                                >
+                                    <Menu.Items className='absolute right-0 mt-2 w-56 origin-top-right divide-y divide-base-300 rounded-md bg-base-200 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+                                        <div className='px-1 py-1 '>
+                                            <Menu.Item>
+                                                {({ active }) => (
+                                                    <button
+                                                        onClick={() => {
+                                                            navigate(
+                                                                '/register/supplier/'
+                                                            )
+                                                        }}
+                                                        className={`${
+                                                            active
+                                                                ? ' bg-neutral text-accent'
+                                                                : 'text-primary'
+                                                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                                    >
+                                                        Register Suppliers
+                                                    </button>
+                                                )}
+                                            </Menu.Item>
+                                            <Menu.Item>
+                                                {({ active }) => (
+                                                    <button
+                                                        className={`${
+                                                            active
+                                                                ? ' bg-neutral text-accent'
+                                                                : 'text-primary'
+                                                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                                    >
+                                                        View Suppliers
+                                                    </button>
+                                                )}
+                                            </Menu.Item>
+                                        </div>
+                                    </Menu.Items>
+                                </Transition>
+                            </Menu>
+                            <Menu
+                                as='div'
+                                className='relative inline-block  text-left'
+                            >
+                                <div className='text-primary hover:text-accent active:text-accent'>
+                                    <Menu.Button className='text-md inline-flex w-full justify-center rounded-md px-4 py-2  font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-opacity-75'>
                                         Users
                                         <ChevronDownIcon
                                             className=' m-auto -mr-1 ml-2 h-5 w-5 '
@@ -343,7 +400,7 @@ const Navbar = () => {
                                 </Transition>
                             </Menu>
                         </div>
-                        <div className='navbar-end flex'>
+                        <div className='flex-1'>
                             <select
                                 value={savedTheme || 'light'}
                                 onChange={handleChange}
@@ -371,7 +428,7 @@ const Navbar = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className='navbar-end gap-3'>
+                    <div className='flex-1 gap-3'>
                         <div className='transform duration-500 hover:translate-y-[-5px]'>
                             <button
                                 className='btn-secondary btn-sm btn whitespace-nowrap'

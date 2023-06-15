@@ -22,7 +22,7 @@ const productsSchema = mongoose.Schema(
         },
         purchased_from: {
             type: Schema.Types.ObjectId,
-            ref: 'clients'
+            ref: 'suppliers'
         },
         temporary_quantity: {
             type: Number,
