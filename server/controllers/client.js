@@ -4,9 +4,11 @@ export const registerClient = async (req, res) => {
     try {
         const { name, credit_limit, terms, address, tin } = req.body
 
+        const backToNum = parseInt(credit_limit.replace(/,/g, ''))
+
         const newClient = new Client({
             name,
-            credit_limit,
+            credit_limit: backToNum,
             terms,
             address,
             tin

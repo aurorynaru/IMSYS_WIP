@@ -9,11 +9,12 @@ import Navbar from '../components/Navbar'
 import { useDispatch } from 'react-redux'
 import { generateCustomID } from '../functions/randomID'
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
-
+import Alert from '../components/Alert'
 const ClientRegister = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [resError, setResError] = useState('')
+    const [successAlert, setSuccessAlert] = useState(false)
 
     const initialValues = {
         name: '',
@@ -76,7 +77,33 @@ const ClientRegister = () => {
     }
 
     const handleSubmit = async (values, onSubmitProps) => {
-        console.log(values)
+        const savedClientResponse = await fetch(
+            'http://localhost:8888/register/client',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(values)
+            }
+        )
+
+        const savedClient = await savedClientResponse.json()
+        console.log(savedClient)
+        if (savedClient.error) {
+            setResError(savedClient.error)
+        }
+
+        if (savedClient) {
+            if (!savedClient.error) {
+                console.log('yo')
+                setSuccessAlert(true)
+                onSubmitProps.resetForm()
+                setTimeout(() => {
+                    setSuccessAlert(false)
+                }, 3000)
+            }
+        }
     }
 
     return (
@@ -127,7 +154,7 @@ const ClientRegister = () => {
 
                             <div className='flex flex-col gap-1 text-black'>
                                 <label
-                                    className='tooltip flex items-center text-left text-sm font-semibold text-neutral'
+                                    className='tooltip z-30 flex items-center text-left text-sm font-semibold text-neutral'
                                     htmlFor='terms'
                                 >
                                     Client Terms
@@ -239,8 +266,8 @@ const ClientRegister = () => {
                             className='btn2 relative overflow-hidden rounded-bl-md rounded-br-md border-opacity-50  py-4 font-semibold uppercase leading-none tracking-wider '
                             type='submit'
                         >
-                            <span className='absolute inset-0 bg-neutral '></span>
-                            <span className='absolute inset-0 flex items-center  justify-center text-primary'>
+                            <span className='absolute inset-0 bg-neutral'></span>
+                            <span className='absolute inset-0 flex  items-center justify-center  text-primary'>
                                 Register Client
                             </span>
                             Register Client
@@ -248,6 +275,7 @@ const ClientRegister = () => {
                     </Form>
                 )}
             </Formik>
+            {successAlert && <Alert text='Client saved!' />}
         </div>
     )
 }
