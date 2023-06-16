@@ -9,11 +9,13 @@ import Navbar from '../components/Navbar'
 import { useDispatch } from 'react-redux'
 import { generateCustomID } from '../functions/randomID'
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
+import Alert from '../components/Alert'
 
 const SupplierRegister = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [resError, setResError] = useState('')
+    const [successAlert, setSuccessAlert] = useState(false)
 
     const initialValues = {
         name: '',
@@ -76,7 +78,33 @@ const SupplierRegister = () => {
     }
 
     const handleSubmit = async (values, onSubmitProps) => {
-        console.log(values)
+        const savedSupplierResponse = await fetch(
+            'http://localhost:8888/register/supplier',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(values)
+            }
+        )
+
+        const savedSupplier = await savedSupplierResponse.json()
+        console.log(savedSupplier)
+        if (savedSupplier.error) {
+            setResError(savedSupplier.error)
+        }
+
+        if (savedSupplier) {
+            if (!savedSupplier.error) {
+                console.log('yo')
+                setSuccessAlert(true)
+                onSubmitProps.resetForm()
+                setTimeout(() => {
+                    setSuccessAlert(false)
+                }, 3000)
+            }
+        }
     }
 
     return (
@@ -99,15 +127,18 @@ const SupplierRegister = () => {
                     <Form
                         autoComplete='off'
                         onSubmit={handleSubmit}
-                        className='mx-auto my-5 flex w-1/3 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-5 shadow-lg'
+                        className='mx-auto my-5 flex w-1/3 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-3 shadow-lg'
                     >
                         <div className='flex flex-col gap-3 px-2  '>
+                            <h1 className='text-lg font-medium '>
+                                Register Supplier
+                            </h1>
                             <div className='flex flex-col gap-1 '>
                                 <label
                                     className='text-sm font-semibold text-neutral'
                                     htmlFor='name'
                                 >
-                                    Client name
+                                    Supplier name
                                 </label>
 
                                 <input
@@ -120,7 +151,7 @@ const SupplierRegister = () => {
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     id='name'
-                                    placeholder='Client name'
+                                    placeholder='Supplier name'
                                 ></input>
                                 {errorText(errors.name, touched.name)}
                             </div>
@@ -147,6 +178,7 @@ const SupplierRegister = () => {
                                     } `}
                                     name='terms'
                                     type='number'
+                                    placeholder='30'
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     value={values.terms}
@@ -198,6 +230,7 @@ const SupplierRegister = () => {
                                     } `}
                                     name='tin'
                                     type='text'
+                                    placeholder='000-000-000-000'
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     value={formatNumber(values.tin)}
@@ -221,7 +254,7 @@ const SupplierRegister = () => {
                                     value={values.address}
                                     onChange={handleChange}
                                     id='address'
-                                    placeholder='Client Address'
+                                    placeholder={`Supplier's Address`}
                                     onBlur={handleBlur}
                                 ></textarea>
                                 {errorText(errors.address, touched.address)}
@@ -248,6 +281,7 @@ const SupplierRegister = () => {
                     </Form>
                 )}
             </Formik>
+            {successAlert && <Alert text='Supplier saved!' />}
         </div>
     )
 }

@@ -34,25 +34,25 @@ export const searchSupplier = async (req, res) => {
     try {
         const { name } = req.params
         const regex = new RegExp(name, 'i')
-        const supplier = await Product.find({
+        const supplier = await Supplier.find({
             name: { $regex: regex }
         })
 
         if (!supplier) {
-            return res.status(400).json('invalid brand name')
+            return res.status(400).json('invalid supplier name')
         }
 
         const suppliers = await Promise.all(
             supplier.map(async (name) => {
                 if (name.name != 'none' && name.name != 'None') {
                     return {
-                        id: name._id.toString(),
+                        id: name._id,
                         name: name.name
                     }
                 }
             })
         )
-
+        console.log(suppliers)
         res.status(200).json(suppliers)
     } catch (error) {
         return res.status(409).json({ error: error.message })

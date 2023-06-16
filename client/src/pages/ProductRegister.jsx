@@ -16,10 +16,15 @@ const ProductRegister = () => {
     const [customID, setCustomID] = useState('')
     const [resError, setResError] = useState('')
     const [itemPrice, setItemPrice] = useState(0)
-    const [searchResult, setSearchResult] = useState([])
-    const [isLoading, setIsLoading] = useState(false)
-    const [suggestedText, setSuggestedText] = useState('')
 
+    //supplier
+    const [isLoadingSupplier, setIsLoadingSupplier] = useState(false)
+    const [searchResultSupplier, setSearchResultSupplier] = useState([])
+    const [supplierValue, setSupplierValue] = useState('')
+
+    //brand
+    const [isLoading, setIsLoading] = useState(false)
+    const [searchResult, setSearchResult] = useState([])
     useEffect(() => {
         setCustomID(generateCustomID('None'))
     }, [])
@@ -90,7 +95,7 @@ const ProductRegister = () => {
             .required('required')
     })
 
-    const handleSearch = async (query) => {
+    const handleSearchBrandName = async (query) => {
         if (query) {
             const newQuery = query.replace(/\s/g, '')
             if (newQuery.length > 0) {
@@ -111,11 +116,40 @@ const ProductRegister = () => {
         }
     }
 
-    const debounce = (submit, delay) => {
+    const handleSearchSupplierName = async (query) => {
+        if (query) {
+            const newQuery = query.replace(/\s/g, '')
+            if (newQuery.length > 0) {
+                const response = await fetch(
+                    `http://localhost:8888/api/supplier/${query}`,
+                    {
+                        method: 'GET'
+                    }
+                )
+
+                const newSearch = await response.json()
+                setSearchResultSupplier(newSearch)
+                setIsLoadingSupplier(false)
+            }
+        } else {
+            setSearchResultSupplier([])
+            setIsLoadingSupplier(false)
+        }
+    }
+
+    const setLoading = (value) => {
+        if (value === 'supplier') {
+            setIsLoadingSupplier(true)
+        } else if (value === 'brand') {
+            setIsLoading(true)
+        }
+    }
+
+    const debounce = (submit, delay, value) => {
         let timeoutID
 
         return (...args) => {
-            setIsLoading(true)
+            setLoading(value)
             clearTimeout(timeoutID)
             timeoutID = setTimeout(() => {
                 submit(...args)
@@ -123,7 +157,21 @@ const ProductRegister = () => {
         }
     }
 
-    const debounceSubmit = debounce(handleSearch, 200)
+    const debounceSubmitBrandName = debounce(
+        handleSearchBrandName,
+        200,
+        'brand'
+    )
+    const debounceSubmitSupplierName = debounce(
+        handleSearchSupplierName,
+        200,
+        'supplier'
+    )
+
+    const getCustomID = (setFieldValue) => {
+        setFieldValue('custom_id', customID)
+        return <h3 className={`${tailWindCss}`}>{customID}</h3>
+    }
 
     return (
         <>
@@ -145,9 +193,12 @@ const ProductRegister = () => {
                     <Form
                         autoComplete='off'
                         onSubmit={handleSubmit}
-                        className='mx-auto my-5 flex w-1/3 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-5 shadow-lg'
+                        className='mx-auto my-5 flex w-1/3 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-3 shadow-lg'
                     >
                         <div className='flex flex-col gap-3 px-2 '>
+                            <h1 className='text-lg font-medium '>
+                                Register Products
+                            </h1>
                             <div className='flex flex-col gap-1'>
                                 <label
                                     className='flex items-center text-left text-sm font-semibold text-neutral'
@@ -161,7 +212,7 @@ const ProductRegister = () => {
                                         <ExclamationCircleIcon className='h-5 w-5 text-neutral' />
                                     </span>
                                 </label>
-                                {console.log(values)}
+
                                 <input
                                     className={` input-primary input input-sm rounded-sm text-primary ${
                                         errors.brand && touched.brand
@@ -171,13 +222,9 @@ const ProductRegister = () => {
                                     value={values.brand}
                                     onChange={(event) => {
                                         const value = event.target.value
-                                        debounceSubmit(value)
+                                        debounceSubmitBrandName(value)
 
                                         setFieldValue('brand', value)
-
-                                        if (values.brand && value.length >= 2) {
-                                            setCustomID(generateCustomID(value))
-                                        }
                                     }}
                                     onBlur={handleBlur}
                                     id='brand'
@@ -199,15 +246,25 @@ const ProductRegister = () => {
                                                                 const text =
                                                                     event.target
                                                                         .innerText
-                                                                setSuggestedText(
-                                                                    text
-                                                                )
+
                                                                 setSearchResult(
                                                                     []
                                                                 )
                                                                 setFieldValue(
                                                                     'brand',
                                                                     text
+                                                                )
+
+                                                                const custom =
+                                                                    setCustomID(
+                                                                        generateCustomID(
+                                                                            text
+                                                                        )
+                                                                    )
+
+                                                                setFieldValue(
+                                                                    'custom_id',
+                                                                    custom
                                                                 )
                                                             }}
                                                         >
@@ -227,6 +284,7 @@ const ProductRegister = () => {
                                 )}
                                 {errorText(errors.brand, touched.brand)}
                             </div>
+                            {console.log(values)}
                             <div className='flex flex-col gap-1 '>
                                 <label
                                     className='flex items-center text-left text-sm font-semibold text-neutral'
@@ -235,7 +293,7 @@ const ProductRegister = () => {
                                     Purchased From
                                     <span
                                         className='tooltip tooltip-right ml-1 before:text-xs'
-                                        data-tip='supplier name???'
+                                        data-tip='supplier name??? also you need to pick from the suggestion box'
                                     >
                                         <ExclamationCircleIcon className='h-5 w-5 text-neutral' />
                                     </span>
@@ -247,12 +305,60 @@ const ProductRegister = () => {
                                             ? ` border-red-500 focus:ring-red-500`
                                             : ''
                                     }`}
-                                    value={values.purchased_from}
-                                    onChange={handleChange}
+                                    value={supplierValue}
+                                    onChange={(event) => {
+                                        const value = event.target.value
+                                        debounceSubmitSupplierName(value)
+
+                                        setSupplierValue(value)
+                                    }}
                                     id='purchased_from'
                                     placeholder='Purchased From'
                                     onBlur={handleBlur}
                                 ></input>
+                                {searchResultSupplier.length > 0 ? (
+                                    <div className=' min-w-3/3 flex h-fit max-h-[180px]  w-2/3 flex-col items-center overflow-auto rounded-md  border-2 border-gray-600  bg-base-300 p-2'>
+                                        {searchResultSupplier.map((elem) => {
+                                            if (elem) {
+                                                return (
+                                                    <div
+                                                        className=' flex h-fit w-full cursor-pointer  items-center  justify-between rounded-md p-1 text-sm font-medium text-primary hover:bg-neutral hover:text-accent'
+                                                        key={elem.id}
+                                                    >
+                                                        <p
+                                                            onClick={(
+                                                                event
+                                                            ) => {
+                                                                const text =
+                                                                    event.target
+                                                                        .innerText
+
+                                                                setSearchResultSupplier(
+                                                                    []
+                                                                )
+                                                                setSupplierValue(
+                                                                    text
+                                                                )
+                                                                setFieldValue(
+                                                                    'purchased_from',
+                                                                    elem.id
+                                                                )
+                                                            }}
+                                                        >
+                                                            {elem.name}
+                                                        </p>
+                                                    </div>
+                                                )
+                                            }
+                                        })}
+                                    </div>
+                                ) : isLoadingSupplier ? (
+                                    <div className=' w-[50px]] flex h-[180px] max-h-[50px] flex-col  items-center justify-center   overflow-auto  rounded-md border-2  border-gray-600 bg-base-300'>
+                                        <span className='loading loading-spinner loading-md text-neutral '></span>
+                                    </div>
+                                ) : (
+                                    ''
+                                )}
                                 {errorText(
                                     errors.purchased_from,
                                     touched.purchased_from
@@ -335,10 +441,7 @@ const ProductRegister = () => {
                                 <label className='text-sm font-semibold text-neutral'>
                                     Custom ID
                                 </label>
-
-                                <h3 className={`${tailWindCss}`}>
-                                    {customID && customID}
-                                </h3>
+                                {getCustomID(setFieldValue)}
                             </div>
                         </div>
                         <p

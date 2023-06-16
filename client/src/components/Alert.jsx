@@ -4,7 +4,7 @@ const Alert = ({ text, css = '' }) => {
     return (
         <div className='flex justify-end'>
             <div
-                className={`alert alert-success  w-1/6 whitespace-nowrap ${css} mx-5`}
+                className={`alert alert-success  w-fit whitespace-nowrap ${css} mx-5`}
             >
                 <svg
                     xmlns='http://www.w3.org/2000/svg'

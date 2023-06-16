@@ -126,9 +126,12 @@ const ClientRegister = () => {
                     <Form
                         autoComplete='off'
                         onSubmit={handleSubmit}
-                        className='mx-auto my-5 flex w-1/3 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-5 shadow-lg'
+                        className='mx-auto my-5 flex w-1/3 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-3 shadow-lg'
                     >
                         <div className='flex flex-col gap-3 px-2  '>
+                            <h1 className='text-lg font-medium '>
+                                Register Client
+                            </h1>
                             <div className='flex flex-col gap-1 '>
                                 <label
                                     className='text-sm font-semibold text-neutral'

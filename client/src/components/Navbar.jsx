@@ -6,6 +6,12 @@ import { setLogOut } from '../state/index.js'
 import { textBlack } from '../tailwindcss.js'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { DocumentIcon } from '@heroicons/react/24/outline'
+import { CubeIcon } from '@heroicons/react/24/outline'
+import { UserGroupIcon } from '@heroicons/react/24/outline'
+import { UserIcon } from '@heroicons/react/24/outline'
+import { TruckIcon } from '@heroicons/react/24/outline'
+
 const Navbar = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -183,7 +189,7 @@ const Navbar = () => {
                                         </Menu>
                                         <Menu
                                             as='div'
-                                            className='relative z-10  inline-block text-left'
+                                            className='relative  inline-block text-left'
                                         >
                                             <div className='text-primary hover:text-accent active:text-accent'>
                                                 <Menu.Button className='inline-flex w-full   justify-start rounded-md px-2 py-2  font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-opacity-75'>
@@ -511,329 +517,121 @@ const Navbar = () => {
                     htmlFor='my-drawer-3'
                     className='drawer-overlay '
                 ></label>
-                <ul className='menu z-[100] h-full w-80 bg-base-200 p-4'>
+                <ul className='menu  min-h-screen w-72 bg-base-200 p-4'>
                     {/* Sidebar content here */}
                     {isAuth ? (
-                        <div className=' flex-1'>
-                            <div className='flex  flex-col gap-5'>
-                                <Menu
-                                    as='div'
-                                    className='relative inline-block  text-left '
-                                >
-                                    <div>
-                                        <Menu.Button className='text-md inline-flex w-fit  justify-start rounded-md    py-2 font-medium text-primary hover:text-accent  focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-opacity-75 active:text-accent'>
+                        <div className='flex flex-col'>
+                            <h1 className='mb-2 font-bold'>General</h1>
+                            <ul className='menu rounded-box w-full bg-base-200 p-0 '>
+                                <li className='flex flex-col gap-4 '>
+                                    <details close='true'>
+                                        <summary>
+                                            <span>
+                                                <DocumentIcon className='h-4 w-4 text-primary' />
+                                            </span>
                                             Invoice
-                                            <ChevronDownIcon
-                                                className=' m-auto -mr-1 ml-2 h-5 w-5 '
-                                                aria-hidden='true'
-                                            />
-                                        </Menu.Button>
-                                    </div>
-                                    <Transition
-                                        as={Fragment}
-                                        enter='transition ease-out duration-100'
-                                        enterFrom='transform opacity-0 scale-95'
-                                        enterTo='transform opacity-100 scale-100'
-                                        leave='transition ease-in duration-75'
-                                        leaveFrom='transform opacity-100 scale-100'
-                                        leaveTo='transform opacity-0 scale-95'
-                                    >
-                                        <Menu.Items className='absolute -right-[60px] -top-1 z-50 w-56 origin-top-right divide-y divide-base-300 rounded-md bg-base-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
-                                            <div className='px-1 py-1 '>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <button
-                                                            className={`${
-                                                                active
-                                                                    ? ' bg-neutral text-accent'
-                                                                    : 'text-primary'
-                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                                                        >
-                                                            Create Invoice
-                                                        </button>
-                                                    )}
-                                                </Menu.Item>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <button
-                                                            className={`${
-                                                                active
-                                                                    ? ' bg-neutral text-accent'
-                                                                    : 'text-primary'
-                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                                                        >
-                                                            Invoice History
-                                                        </button>
-                                                    )}
-                                                </Menu.Item>
-                                            </div>
-                                            <div className='px-1 py-1'>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <button
-                                                            className={`${
-                                                                active
-                                                                    ? ' bg-neutral text-accent'
-                                                                    : 'text-primary'
-                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                                                        >
-                                                            Delivery Receipt
-                                                        </button>
-                                                    )}
-                                                </Menu.Item>
-                                            </div>
-                                        </Menu.Items>
-                                    </Transition>
-                                </Menu>
-                                <Menu
-                                    as='div'
-                                    className='relative z-10  inline-block text-left'
-                                >
-                                    <div>
-                                        <Menu.Button className='inline-flex w-fit  justify-start rounded-md   py-2 font-medium text-primary hover:text-accent  focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-opacity-75 active:text-accent'>
-                                            Products
-                                            <ChevronDownIcon
-                                                className=' m-auto -mr-1 ml-2 h-5 w-5 '
-                                                aria-hidden='true'
-                                            />
-                                        </Menu.Button>
-                                    </div>
-                                    <Transition
-                                        as={Fragment}
-                                        enter='transition ease-out duration-100'
-                                        enterFrom='transform opacity-0 scale-95'
-                                        enterTo='transform opacity-100 scale-100'
-                                        leave='transition ease-in duration-75'
-                                        leaveFrom='transform opacity-100 scale-100'
-                                        leaveTo='transform opacity-0 scale-95'
-                                    >
-                                        <Menu.Items className='absolute  -right-[60px] -top-1 w-56 origin-top-right divide-y divide-base-300 rounded-md  bg-base-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
-                                            <div className='px-1 py-1 '>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <button
-                                                            className={`${
-                                                                active
-                                                                    ? ' bg-neutral text-accent'
-                                                                    : 'text-primary'
-                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm font-normal `}
-                                                        >
-                                                            Create Purchase
-                                                            Order
-                                                        </button>
-                                                    )}
-                                                </Menu.Item>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <button
-                                                            onClick={() => {
-                                                                navigate(
-                                                                    '/register/product'
-                                                                )
-                                                            }}
-                                                            className={`${
-                                                                active
-                                                                    ? ' bg-neutral text-accent'
-                                                                    : 'text-primary'
-                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm font-normal`}
-                                                        >
-                                                            Register Products
-                                                        </button>
-                                                    )}
-                                                </Menu.Item>
-                                            </div>
-                                            <div className='px-1 py-1'>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <button
-                                                            className={`${
-                                                                active
-                                                                    ? ' bg-neutral text-accent'
-                                                                    : 'text-primary'
-                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm font-normal`}
-                                                        >
-                                                            Purchase History
-                                                        </button>
-                                                    )}
-                                                </Menu.Item>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <button
-                                                            className={`${
-                                                                active
-                                                                    ? ' bg-neutral text-accent'
-                                                                    : 'text-primary'
-                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm font-normal`}
-                                                        >
-                                                            View Products
-                                                        </button>
-                                                    )}
-                                                </Menu.Item>
-                                            </div>
-                                        </Menu.Items>
-                                    </Transition>
-                                </Menu>
+                                        </summary>
 
-                                <Menu
-                                    as='div'
-                                    className='relative inline-block  text-left'
-                                >
-                                    <div>
-                                        <Menu.Button className='text-md inline-flex w-fit  justify-start rounded-md    py-2 font-medium text-primary hover:text-accent  focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-opacity-75 active:text-accent'>
+                                        <ul>
+                                            <li>
+                                                <a>Create invoice</a>
+                                            </li>
+                                            <li>
+                                                <a>Invoice History</a>
+                                            </li>
+                                            <li>
+                                                <a>Delivery Receipt</a>
+                                            </li>
+                                        </ul>
+                                    </details>
+                                    <details close='true'>
+                                        <summary>
+                                            <span>
+                                                <CubeIcon className='h-4 w-4 text-primary' />
+                                            </span>
+                                            Products
+                                        </summary>
+
+                                        <ul>
+                                            <li
+                                                onClick={() => {
+                                                    navigate(
+                                                        '/register/product'
+                                                    )
+                                                }}
+                                            >
+                                                <a>Register Products</a>
+                                            </li>
+                                            <li>
+                                                <a>Purchase History</a>
+                                            </li>
+                                            <li>
+                                                <a>View Products</a>
+                                            </li>
+                                        </ul>
+                                    </details>
+                                    <details close='true'>
+                                        <summary>
+                                            <span>
+                                                <UserGroupIcon className='h-4 w-4 text-primary' />
+                                            </span>
                                             Client
-                                            <ChevronDownIcon
-                                                className=' m-auto -mr-1 ml-2 h-5 w-5 '
-                                                aria-hidden='true'
-                                            />
-                                        </Menu.Button>
-                                    </div>
-                                    <Transition
-                                        as={Fragment}
-                                        enter='transition ease-out duration-100'
-                                        enterFrom='transform opacity-0 scale-95'
-                                        enterTo='transform opacity-100 scale-100'
-                                        leave='transition ease-in duration-75'
-                                        leaveFrom='transform opacity-100 scale-100'
-                                        leaveTo='transform opacity-0 scale-95'
-                                    >
-                                        <Menu.Items className='absolute  -right-[60px] -top-1 w-56 origin-top-right divide-y divide-base-300 rounded-md bg-base-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
-                                            <div className='px-1 py-1 '>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <button
-                                                            onClick={() => {
-                                                                navigate(
-                                                                    '/register/client/'
-                                                                )
-                                                            }}
-                                                            className={`${
-                                                                active
-                                                                    ? ' bg-neutral text-accent'
-                                                                    : 'text-primary'
-                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                                                        >
-                                                            Register Clients
-                                                        </button>
-                                                    )}
-                                                </Menu.Item>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <button
-                                                            className={`${
-                                                                active
-                                                                    ? ' bg-neutral text-accent'
-                                                                    : 'text-primary'
-                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                                                        >
-                                                            View Clients
-                                                        </button>
-                                                    )}
-                                                </Menu.Item>
-                                            </div>
-                                        </Menu.Items>
-                                    </Transition>
-                                </Menu>
-                                <Menu
-                                    as='div'
-                                    className='relative inline-block  text-left'
-                                >
-                                    <div>
-                                        <Menu.Button className='text-md inline-flex w-fit  justify-start rounded-md   py-2 font-medium text-primary hover:text-accent  focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-opacity-75 active:text-accent'>
+                                        </summary>
+
+                                        <ul>
+                                            <li
+                                                onClick={() => {
+                                                    navigate(
+                                                        '/register/client/'
+                                                    )
+                                                }}
+                                            >
+                                                <a>Register Client</a>
+                                            </li>
+                                            <li>
+                                                <a>View Clients</a>
+                                            </li>
+                                        </ul>
+                                    </details>
+                                    <details close='true'>
+                                        <summary>
+                                            <span>
+                                                <TruckIcon className='h-4 w-4 text-primary' />
+                                            </span>
                                             Supplier
-                                            <ChevronDownIcon
-                                                className=' m-auto -mr-1 ml-2 h-5 w-5 '
-                                                aria-hidden='true'
-                                            />
-                                        </Menu.Button>
-                                    </div>
-                                    <Transition
-                                        as={Fragment}
-                                        enter='transition ease-out duration-100'
-                                        enterFrom='transform opacity-0 scale-95'
-                                        enterTo='transform opacity-100 scale-100'
-                                        leave='transition ease-in duration-75'
-                                        leaveFrom='transform opacity-100 scale-100'
-                                        leaveTo='transform opacity-0 scale-95'
-                                    >
-                                        <Menu.Items className='absolute  -right-[60px] -top-1 w-56 origin-top-right divide-y divide-base-300 rounded-md bg-base-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
-                                            <div className='px-1 py-1 '>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <button
-                                                            onClick={() => {
-                                                                navigate(
-                                                                    '/register/supplier/'
-                                                                )
-                                                            }}
-                                                            className={`${
-                                                                active
-                                                                    ? ' bg-neutral text-accent'
-                                                                    : 'text-primary'
-                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                                                        >
-                                                            Register Suppliers
-                                                        </button>
-                                                    )}
-                                                </Menu.Item>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <button
-                                                            className={`${
-                                                                active
-                                                                    ? ' bg-neutral text-accent'
-                                                                    : 'text-primary'
-                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                                                        >
-                                                            View Suppliers
-                                                        </button>
-                                                    )}
-                                                </Menu.Item>
-                                            </div>
-                                        </Menu.Items>
-                                    </Transition>
-                                </Menu>
-                                <Menu
-                                    as='div'
-                                    className='relative inline-block  text-left'
-                                >
-                                    <div>
-                                        <Menu.Button className='text-md inline-flex w-fit  justify-start rounded-md   py-2 font-medium text-primary hover:text-accent  focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-opacity-75 active:text-accent'>
+                                        </summary>
+
+                                        <ul>
+                                            <li
+                                                onClick={() => {
+                                                    navigate(
+                                                        '/register/supplier/'
+                                                    )
+                                                }}
+                                            >
+                                                <a>Register Supplier</a>
+                                            </li>
+                                            <li>
+                                                <a>View Suppliers</a>
+                                            </li>
+                                        </ul>
+                                    </details>
+                                    <details close='true'>
+                                        <summary>
+                                            <span>
+                                                <UserIcon className='h-4 w-4 text-primary' />
+                                            </span>
                                             Users
-                                            <ChevronDownIcon
-                                                className=' m-auto -mr-1 ml-2 h-5 w-5 '
-                                                aria-hidden='true'
-                                            />
-                                        </Menu.Button>
-                                    </div>
-                                    <Transition
-                                        as={Fragment}
-                                        enter='transition ease-out duration-100'
-                                        enterFrom='transform opacity-0 scale-95'
-                                        enterTo='transform opacity-100 scale-100'
-                                        leave='transition ease-in duration-75'
-                                        leaveFrom='transform opacity-100 scale-100'
-                                        leaveTo='transform opacity-0 scale-95'
-                                    >
-                                        <Menu.Items className='absolute  -right-[60px] -top-1 w-56 origin-top-right divide-y divide-base-300 rounded-md bg-base-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
-                                            <div className='px-1 py-1 '>
-                                                <Menu.Item>
-                                                    {({ active }) => (
-                                                        <button
-                                                            className={`${
-                                                                active
-                                                                    ? ' bg-neutral text-accent'
-                                                                    : 'text-primary'
-                                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                                                        >
-                                                            Search Users
-                                                        </button>
-                                                    )}
-                                                </Menu.Item>
-                                            </div>
-                                        </Menu.Items>
-                                    </Transition>
-                                </Menu>
-                            </div>
+                                        </summary>
+
+                                        <ul>
+                                            <li>
+                                                <a>Search Users</a>
+                                            </li>
+                                        </ul>
+                                    </details>
+                                </li>
+                            </ul>
                             <div className='mt-10 flex max-w-fit  items-start gap-5'>
                                 <button
                                     className='btn-primary btn-sm btn  transform text-base-100 duration-500 hover:translate-y-[-5px] hover:text-neutral'
