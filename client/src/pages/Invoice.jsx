@@ -3,44 +3,33 @@ import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik'
 import * as yup from 'yup'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
-import Navbar from "../components/Navbar"
-import CustomInput from "../components/CustomInput"
-import CustomSelect from "../components/CustomSelect"
-import CustomText from "../components/CustomText"
+import Navbar from '../components/Navbar'
+import CustomInput from '../components/CustomInput'
+import CustomSelect from '../components/CustomSelect'
+import CustomText from '../components/CustomText'
 import CustomTextBox from '../components/CustomTextBox'
 const Invoice = () => {
-    
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const [customID, setCustomID] = useState('')
+    const [resError, setResError] = useState('')
+    const [itemPrice, setItemPrice] = useState(0)
 
+    //supplier
+    const [isLoadingClient, setIsLoadingClient] = useState(false)
+    const [searchResultClient, setSearchResultClient] = useState([])
+    const [ClientValue, setClientValue] = useState('')
 
-    const [selectedTags, setSelectedTags] = useState([])
-    const [inputTag, setInputTag] = useState('')
-    const [isFocus, setIsFocus] = useState(false)
+    useEffect(() => {
+        setCustomID(generateCustomID('None'))
+    }, [])
 
-    const handleTagSelection = (tag, valuesTag, setFieldValue) => {
-       
-        setSelectedTags(tag)
-           console.log(selectedTags)
-        setFieldValue('client', tag)
-        setInputTag('')
-    }
-
-    const clientArray=[
-        {
-        name:"KFC",
-        address:"54 dona francesca st",
-        terms:"30",
-        credit_limit:"5000000",
-        tin:"232-434-950-000"
-    
-    }
-]
-    
     const initialValues = {
-        invoice_number: "",
+        invoice_number: '',
         client: '',
         address: '',
         items: [],
-        date_created: "",
+        date_created: '',
         terms: '',
         recipient: '',
         vatable_sales: '',
@@ -48,11 +37,11 @@ const Invoice = () => {
         total_sales_vat_inclusive: '',
         less_vat: '',
         net_vat: '',
-        total_amount_due:"",
-        user_id:"",
-        status:""
+        total_amount_due: '',
+        user_id: '',
+        status: ''
     }
-    
+
     const Schema = yup.object().shape({
         invoice_number: yup.number().min(4).required('required'),
         client: yup.string().min(3).max(100).required('required'),
@@ -86,134 +75,173 @@ const Invoice = () => {
             .min(2)
             .positive('Number must be positive')
             .required('required'),
-        user_id:"",
-        status:""
+        user_id: '',
+        status: ''
     })
 
-    const handleSubmit =(values)=>{
+    const handleSubmit = (values) => {
         console.log(values)
+    }
+
+    const handleSearchClient = async (query) => {
+        if (query) {
+            const newQuery = query.replace(/\s/g, '')
+            if (newQuery.length > 0) {
+                const response = await fetch(
+                    `http://localhost:8888/api/Client/${query}`,
+                    {
+                        method: 'GET'
+                    }
+                )
+
+                const newSearch = await response.json()
+                setSearchResultClient(newSearch)
+                setIsLoadingClient(false)
+            }
+        } else {
+            setSearchResultClient([])
+            setIsLoadingClient(false)
+        }
     }
 
     return (
         <>
-        <Navbar />
-        <div>
-            <Formik
-                initialValues={initialValues}
-                validationSchema={Schema}
-                onSubmit={handleSubmit}
-            >
-                {({
-                    errors,
-                    handleChange,
-                    handleSubmit,
-                    touched,
-                    values,
-                    setFieldValue,
-                    handleBlur
-                }) => (
-                    <Form
-                        autoComplete='off'
-                        className='flex flex-col gap-5 pt-5  mt-10 w-1/3 mx-auto shadow-lg rounded-md bg-neutral-800 min-w-[550px]'
-                        onSubmit={handleSubmit}
-                    >
-                        <div className='px-2 gap-4 flex flex-col'>
-                    
-                            <CustomInput
-                                label='Client name'
-                                type='text'
-                                placeholder='client name '
-                                value={inputTag}
-                                onChange={(e) => {
-                                    setInputTag(e.target.value)
-                                }}
-                            />
-                            <div className='flex gap-2 overflow-x-auto relative'>
-                                {selectedTags.map((tag) => {
-                                    console.log("tag",tag)
-                                    return (
-                                    <span
-                                        key={tag}
-                                        className=' flex text-xs p-1 bg-blue-light text-dark hover:bg-white-blue rounded-md cursor-pointer'
-                                        onClick={(e) =>
-                                            handleTagSelection(tag)
-                                        }
-                                    >
-                                        {tag}
-                                        <XMarkIcon className='pl-[3px] pb-[3px] w-3 h-3 ' />
-                                    </span>)}
-                                )}
-                            </div>
-                            <div className='relative top-[-35px] '>
-                                {inputTag ? (
-                                    <div className='flex flex-col justify-center overflow-y-scroll  max-h-[200px] w-auto h-auto absolute bg-neutral-900 '>
-                                        {clientArray
-                                            .filter((tag) =>{
-                                               
-                                                return  tag.name.includes(inputTag)
-                                            }
-                                               
-                                            )
-                                            .map((tag) => {
-                                                console.log(tag)
-                                                return (
-                                                    <div
-                                                        key={tag.name}
-                                                        className='flex items-center cursor-pointer my-[4px]  w-44'
-                                                        onClick={() => {
-                                                            handleTagSelection(
-                                                                tag.name,
-                                                                values.tags.name,
-                                                                setFieldValue
-                                                            )
-                                                        }}
-                                                    >
-                                                        <span className='text-sm pl-1 block  overflow-hidden text-ellipsis cursor-pointer w-1/2 border-2 border-r-0 border-blue-light'>
-                                                            {tag.name}
-                                                        </span>
-                                                        <span className='text-xs w-1/2 py-1 text-center font-medium bg-blue-light text-dark hover:bg-white-blue '>
-                                                            select client
-                                                        </span>
-                                                    </div>
-                                                )
-                                            })}
-                                    </div>
-                                ) : (
-                                    ''
-                                )}
-                            </div>
-                            <button
-                                className='py-2 text-sm  disabled:bg-opacity-50 px-1 cursor-pointer w-full truncate rounded-tr-md rounded-md  bg-blue-light text-dark hover:bg-white-blue'
-                                type='button'
-                                disabled={!inputTag}
-                                onClick={() => {
-                                    handleTagSelection(
-                                        inputTag,
-                                        values.tags.name,
-                                        setFieldValue
-                                    )
-                                }}
-                            >
-                                Select client name
-                            </button>
-                        </div>
-                  
-
-                        <button
-                            className='btn2 py-4  relative rounded-br-md rounded-bl-md border-opacity-50  uppercase font-semibold tracking-wider leading-none overflow-hidden '
-                            type='submit'
+            <Navbar />
+            <div>
+                <Formik
+                    initialValues={initialValues}
+                    validationSchema={Schema}
+                    onSubmit={handleSubmit}
+                >
+                    {({
+                        errors,
+                        handleChange,
+                        handleSubmit,
+                        touched,
+                        values,
+                        setFieldValue,
+                        handleBlur
+                    }) => (
+                        <Form
+                            autoComplete='off'
+                            onSubmit={handleSubmit}
+                            className='mx-auto my-5 flex w-1/3 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-3 shadow-lg'
                         >
-                            <span className='absolute inset-0 bg-blue-light '></span>
-                            <span className='absolute inset-0 flex justify-center  items-center'>
+                            <div className='flex flex-col gap-3 px-2 '>
+                                <h1 className='text-lg font-medium '>
+                                    Create Invoice
+                                </h1>
+                                <div className='flex flex-col gap-1'>
+                                    <label
+                                        className='flex items-center text-left text-sm font-semibold text-neutral'
+                                        htmlFor='brand'
+                                    >
+                                        Client Name
+                                        <span
+                                            className='tooltip tooltip-right ml-1 before:text-xs'
+                                            data-tip='brand name'
+                                        >
+                                            <ExclamationCircleIcon className='h-5 w-5 text-neutral' />
+                                        </span>
+                                    </label>
+
+                                    <input
+                                        className={` input-primary input input-sm rounded-sm text-primary ${
+                                            errors.brand && touched.brand
+                                                ? ` border-red-500 focus:ring-red-500`
+                                                : ''
+                                        }`}
+                                        value={values.brand}
+                                        onChange={(event) => {
+                                            const value = event.target.value
+                                            debounceSubmitBrandName(value)
+                                            setCustomID(generateCustomID(value))
+                                            setFieldValue('custom_id', value)
+                                            setFieldValue('brand', value)
+                                        }}
+                                        onBlur={handleBlur}
+                                        id='brand'
+                                        placeholder='Enter Brand name'
+                                    ></input>
+                                    {searchResult.length > 0 ? (
+                                        <div className=' min-w-3/3 flex h-fit max-h-[180px]  w-2/3 flex-col items-center overflow-auto rounded-md  border-2 border-gray-600  bg-base-300 p-2'>
+                                            {searchResult.map((elem) => {
+                                                if (elem) {
+                                                    return (
+                                                        <div
+                                                            className=' flex h-fit w-full cursor-pointer  items-center  justify-between rounded-md p-1 text-sm font-medium text-primary hover:bg-neutral hover:text-accent'
+                                                            key={elem.id}
+                                                        >
+                                                            <p
+                                                                onClick={(
+                                                                    event
+                                                                ) => {
+                                                                    const text =
+                                                                        event
+                                                                            .target
+                                                                            .innerText
+
+                                                                    setSearchResult(
+                                                                        []
+                                                                    )
+                                                                    setFieldValue(
+                                                                        'brand',
+                                                                        text
+                                                                    )
+
+                                                                    const custom =
+                                                                        setCustomID(
+                                                                            generateCustomID(
+                                                                                text
+                                                                            )
+                                                                        )
+
+                                                                    setFieldValue(
+                                                                        'custom_id',
+                                                                        custom
+                                                                    )
+                                                                }}
+                                                            >
+                                                                {elem.name}
+                                                            </p>
+                                                        </div>
+                                                    )
+                                                }
+                                            })}
+                                        </div>
+                                    ) : isLoading ? (
+                                        <div className=' w-[50px]] flex h-[180px] max-h-[50px] flex-col  items-center justify-center   overflow-auto  rounded-md border-2  border-gray-600 bg-base-300'>
+                                            <span className='loading loading-spinner loading-md text-neutral '></span>
+                                        </div>
+                                    ) : (
+                                        ''
+                                    )}
+                                    {errorText(errors.brand, touched.brand)}
+                                </div>
+                                {console.log(values)}
+                            </div>
+                            <p
+                                className={`w-full text-center text-sm text-red-500 ${
+                                    resError ? '' : 'invisible'
+                                }`}
+                            >
+                                {resError ? resError : 'error'}
+                            </p>
+                            <button
+                                className='btn2 relative overflow-hidden rounded-bl-md rounded-br-md border-opacity-50  py-4 font-semibold uppercase leading-none tracking-wider'
+                                type='submit'
+                            >
+                                <span className='absolute inset-0 bg-neutral '></span>
+                                <span className='absolute inset-0 flex items-center  justify-center text-primary'>
+                                    Submit
+                                </span>
                                 Submit
-                            </span>
-                            Submit
-                        </button>
-                    </Form>
-                )}
-            </Formik>
-        </div>
-    </>
+                            </button>
+                        </Form>
+                    )}
+                </Formik>
+            </div>
+        </>
     )
 }
 
