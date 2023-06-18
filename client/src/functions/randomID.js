@@ -6,7 +6,7 @@ export const generateCustomID = (brand) => {
         brand === 'None' ||
         brand === 'none' ||
         brand === ' ' ||
-        brand.length < 2
+        brand.split('').length < 2
     ) {
         prefix = 'PID-'
     }

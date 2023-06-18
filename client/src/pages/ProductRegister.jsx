@@ -3,7 +3,6 @@ import { Formik, Form, ErrorMessage } from 'formik'
 import * as yup from 'yup'
 import { useNavigate } from 'react-router-dom'
 import { tailWindCss } from '../tailwindcss'
-import { textBlack } from '../tailwindcss'
 import { errorText } from '../functions/errorText.jsx'
 import Navbar from '../components/Navbar'
 import { useDispatch } from 'react-redux'
@@ -168,9 +167,10 @@ const ProductRegister = () => {
         'supplier'
     )
 
-    const getCustomID = (setFieldValue) => {
-        setFieldValue('custom_id', customID)
-        return <h3 className={`${tailWindCss}`}>{customID}</h3>
+    const getCustomID = (setFieldValue, touched, brand) => {
+        if (customID && touched && brand) {
+            setFieldValue('custom_id', brand)
+        }
     }
 
     return (
@@ -223,7 +223,8 @@ const ProductRegister = () => {
                                     onChange={(event) => {
                                         const value = event.target.value
                                         debounceSubmitBrandName(value)
-
+                                        setCustomID(generateCustomID(value))
+                                        setFieldValue('custom_id', value)
                                         setFieldValue('brand', value)
                                     }}
                                     onBlur={handleBlur}
@@ -441,7 +442,8 @@ const ProductRegister = () => {
                                 <label className='text-sm font-semibold text-neutral'>
                                     Custom ID
                                 </label>
-                                {getCustomID(setFieldValue)}
+
+                                <h3 className={`${tailWindCss}`}>{customID}</h3>
                             </div>
                         </div>
                         <p
