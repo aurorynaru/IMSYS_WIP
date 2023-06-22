@@ -28,8 +28,8 @@ export const searchClient = async (req, res) => {
             name: { $regex: regex }
         })
 
-        if (!supplier) {
-            return res.status(400).json('invalid supplier name')
+        if (!client) {
+            return res.status(400).json('invalid client name')
         }
 
         const Clients = await Promise.all(
@@ -45,7 +45,7 @@ export const searchClient = async (req, res) => {
                 }
             })
         )
-
+        console.log(Clients)
         res.status(200).json(Clients)
     } catch (error) {
         res.status(409).json({ error: error.message })

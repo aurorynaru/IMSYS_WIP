@@ -142,6 +142,11 @@ const Navbar = () => {
                                                         <Menu.Item>
                                                             {({ active }) => (
                                                                 <button
+                                                                    onClick={() => {
+                                                                        navigate(
+                                                                            '/create/invoice'
+                                                                        )
+                                                                    }}
                                                                     className={`${
                                                                         active
                                                                             ? ' bg-neutral text-accent'
@@ -533,7 +538,11 @@ const Navbar = () => {
                                         </summary>
 
                                         <ul>
-                                            <li>
+                                            <li
+                                                onClick={() => {
+                                                    navigate('/create/invoice')
+                                                }}
+                                            >
                                                 <a>Create invoice</a>
                                             </li>
                                             <li>
