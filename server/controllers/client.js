@@ -37,6 +37,7 @@ export const searchClient = async (req, res) => {
                 if (name.name != 'none' && name.name != 'None') {
                     return {
                         id: name._id,
+                        address: name.address,
                         name: name.name,
                         terms: name.terms,
                         credit_limit: name.credit_limit,
@@ -45,7 +46,7 @@ export const searchClient = async (req, res) => {
                 }
             })
         )
-        console.log(Clients)
+
         res.status(200).json(Clients)
     } catch (error) {
         res.status(409).json({ error: error.message })

@@ -38,6 +38,7 @@ const ProductRegister = () => {
     }
     //use multer
     const handleSubmit = async (values, onSubmitProps) => {
+        console.log(values)
         const savedUserResponse = await fetch(
             'http://localhost:8888/register/product',
             {
@@ -51,13 +52,13 @@ const ProductRegister = () => {
 
         const savedProduct = await savedUserResponse.json()
         if (savedProduct.error) {
-            setResError(loggedIn.error)
+            setResError(savedProduct.error)
         }
 
         if (savedProduct) {
             if (!savedProduct.error) {
                 navigate('/register/product')
-                onSubmitProps.resetProps()
+                onSubmitProps.resetForm()
             }
         }
     }
@@ -222,6 +223,7 @@ const ProductRegister = () => {
                                     value={values.brand}
                                     onChange={(event) => {
                                         const value = event.target.value
+                                        console.log('values', value)
                                         debounceSubmitBrandName(value)
                                         setCustomID(generateCustomID(value))
                                         setFieldValue('custom_id', value)
@@ -255,17 +257,14 @@ const ProductRegister = () => {
                                                                     'brand',
                                                                     text
                                                                 )
-
-                                                                const custom =
-                                                                    setCustomID(
-                                                                        generateCustomID(
-                                                                            text
-                                                                        )
-                                                                    )
+                                                                setFieldValue(
+                                                                    'custom_id',
+                                                                    ''
+                                                                )
 
                                                                 setFieldValue(
                                                                     'custom_id',
-                                                                    custom
+                                                                    customID
                                                                 )
                                                             }}
                                                         >

@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
 import { errorText } from '../functions/errorText'
+import TableForm from '../components/TableForm'
 
 const Invoice = () => {
     const dispatch = useDispatch()
@@ -47,7 +48,7 @@ const Invoice = () => {
         invoice_number: yup.number().min(4).required('required'),
         credit_limit: yup.string().required('Credit limit is required'),
         client: yup.string().min(3).max(100).required('required'),
-        address: yup.string(),
+        address: yup.string().required('required'),
         date_created: yup.date().required('required'),
         terms: yup.number(),
         recipient: yup.string().required('required'),
@@ -175,7 +176,7 @@ const Invoice = () => {
     return (
         <>
             <Navbar />
-            <div>
+            <div className='flex w-full'>
                 <Formik
                     initialValues={initialValues}
                     validationSchema={Schema}
@@ -193,7 +194,7 @@ const Invoice = () => {
                         <Form
                             autoComplete='off'
                             onSubmit={handleSubmit}
-                            className='mx-auto my-5 flex w-1/3 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-3 shadow-lg'
+                            className='mx-5 my-5 flex w-1/2 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-3 shadow-lg'
                         >
                             <div className='flex flex-col gap-3 px-2 '>
                                 <h1 className='text-lg font-medium '>
@@ -233,65 +234,94 @@ const Invoice = () => {
                                         <div className=' min-w-3/3 flex h-fit max-h-[180px]  w-2/3 flex-col items-center overflow-auto rounded-md  border-2 border-gray-600  bg-base-300 p-2'>
                                             {searchResultClient.map((elem) => {
                                                 if (elem) {
+                                                    console.log(elem)
                                                     return (
                                                         <div
+                                                            onMouseEnter={(
+                                                                event
+                                                            ) => {
+                                                                const text =
+                                                                    event.target
+                                                                        .innerText
+
+                                                                setFieldValue(
+                                                                    'client',
+                                                                    text
+                                                                )
+                                                                setFieldValue(
+                                                                    'tin',
+                                                                    elem.tin
+                                                                )
+                                                                setFieldValue(
+                                                                    'terms',
+                                                                    elem.terms
+                                                                )
+                                                                setFieldValue(
+                                                                    'credit_limit',
+                                                                    elem.credit_limit
+                                                                )
+                                                                setFieldValue(
+                                                                    'address',
+                                                                    elem.address
+                                                                )
+                                                            }}
+                                                            onMouseLeave={() => {
+                                                                setFieldValue(
+                                                                    'client',
+                                                                    ''
+                                                                )
+                                                                setFieldValue(
+                                                                    'tin',
+                                                                    ''
+                                                                )
+                                                                setFieldValue(
+                                                                    'terms',
+                                                                    ''
+                                                                )
+                                                                setFieldValue(
+                                                                    'credit_limit',
+                                                                    ''
+                                                                )
+                                                                setFieldValue(
+                                                                    'address',
+                                                                    ''
+                                                                )
+                                                            }}
+                                                            onClick={(
+                                                                event
+                                                            ) => {
+                                                                const text =
+                                                                    event.target
+                                                                        .innerText
+
+                                                                setSearchResultClient(
+                                                                    []
+                                                                )
+                                                                setFieldValue(
+                                                                    'client',
+                                                                    text
+                                                                )
+                                                                setFieldValue(
+                                                                    'tin',
+                                                                    elem.tin
+                                                                )
+                                                                setFieldValue(
+                                                                    'terms',
+                                                                    elem.terms
+                                                                )
+                                                                setFieldValue(
+                                                                    'credit_limit',
+                                                                    elem.credit_limit
+                                                                )
+                                                                setFieldValue(
+                                                                    'address',
+                                                                    elem.address
+                                                                )
+                                                            }}
                                                             className=' flex h-fit w-full cursor-pointer  items-center  justify-between rounded-md p-1 text-sm font-medium text-primary hover:bg-neutral hover:text-accent'
                                                             key={elem.id}
                                                         >
-                                                            <p
-                                                                onMouseEnter={(
-                                                                    event
-                                                                ) => {
-                                                                    console.log(
-                                                                        elem
-                                                                    )
-                                                                    const text =
-                                                                        event
-                                                                            .target
-                                                                            .innerText
-
-                                                                    setFieldValue(
-                                                                        'client',
-                                                                        text
-                                                                    )
-                                                                    setFieldValue(
-                                                                        'tin',
-                                                                        elem.tin
-                                                                    )
-                                                                    setFieldValue(
-                                                                        'terms',
-                                                                        elem.terms
-                                                                    )
-                                                                    setFieldValue(
-                                                                        'credit_limit',
-                                                                        elem.credit_limit
-                                                                    )
-                                                                }}
-                                                                onMouseLeave={() => {
-                                                                    setFieldValue(
-                                                                        'client',
-                                                                        ''
-                                                                    )
-                                                                }}
-                                                                onClick={(
-                                                                    event
-                                                                ) => {
-                                                                    const text =
-                                                                        event
-                                                                            .target
-                                                                            .innerText
-
-                                                                    setSearchResultClient(
-                                                                        []
-                                                                    )
-                                                                    setFieldValue(
-                                                                        'client',
-                                                                        text
-                                                                    )
-                                                                }}
-                                                            >
-                                                                {elem.name}
-                                                            </p>
+                                                            <p>{elem.name}</p>
                                                         </div>
                                                     )
                                                 }
@@ -412,7 +442,11 @@ const Invoice = () => {
                                     {errorText(errors.tin, touched.tin)}
                                 </div>
                             </div>
+                            <div className='border-red flex w-full items-center border-2 p-2'>
+                                <div className='sat'></div>
 
+                                <TableForm />
+                            </div>
                             <p
                                 className={`w-full text-center text-sm text-red-500 ${
                                     resError ? '' : 'invisible'
@@ -420,20 +454,20 @@ const Invoice = () => {
                             >
                                 {resError ? resError : 'error'}
                             </p>
-
                             <button
                                 className='btn2 relative overflow-hidden rounded-bl-md rounded-br-md border-opacity-50  py-4 font-semibold uppercase leading-none tracking-wider'
                                 type='submit'
                             >
                                 <span className='absolute inset-0 bg-neutral '></span>
                                 <span className='absolute inset-0 flex items-center  justify-center text-primary'>
-                                    Submit
+                                    Save
                                 </span>
-                                Submit
+                                Save
                             </button>
                         </Form>
                     )}
                 </Formik>
+                <div className='sat'>yo</div>
             </div>
         </>
     )

@@ -19,6 +19,10 @@ const clientSchema = mongoose.Schema(
             type: String,
             required: true
         },
+        address: {
+            type: String,
+            required: true
+        },
         invoice: [{ type: Schema.Types.ObjectId, ref: 'invoice', default: [] }],
         isBeingEdited: {
             type: Boolean,

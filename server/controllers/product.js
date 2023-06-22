@@ -8,6 +8,7 @@ export const registerProduct = async (req, res) => {
         // if (product) {
         //     throw new Error('Duplicate product')
         // }
+
         const newProduct = new Product({
             custom_id,
             brand,
