@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom'
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
 import { errorText } from '../functions/errorText'
 import TableForm from '../components/TableForm'
+import Search from '../components/Search'
 
 const Invoice = () => {
     const dispatch = useDispatch()
@@ -23,6 +24,14 @@ const Invoice = () => {
     const [isLoadingClient, setIsLoadingClient] = useState(false)
     const [searchResultClient, setSearchResultClient] = useState([])
     const [ClientValue, setClientValue] = useState('')
+
+    // products
+    const [itemsObject, setItemsObject] = useState(null)
+    const [quantity, setQuantity] = useState(0)
+    const [unit, setUnit] = useState('')
+    const [description, setDescription] = useState('')
+    const [unitPrice, setUnitPrice] = useState(0)
+    const [amount, setAmount] = useState(0)
 
     const initialValues = {
         invoice_number: '',
@@ -41,7 +50,14 @@ const Invoice = () => {
         net_vat: '',
         total_amount_due: '',
         user_id: '',
-        status: ''
+        status: '',
+        itemsObject: {},
+        quantity: 0,
+        unit: '',
+        description: '',
+        unitPrice: 0,
+        amount: 0,
+        TotalAmount: 0
     }
 
     const Schema = yup.object().shape({
@@ -83,6 +99,29 @@ const Invoice = () => {
             .min(2)
             .positive('Number must be positive')
             .required('required'),
+        itemsObject: yup.object().required('required'),
+        quantity: yup
+            .number()
+            .min(1)
+            .positive('Number must be positive')
+            .required('required'),
+        unit: yup.string().required('required'),
+        description: yup.string().required('required'),
+        unitPrice: yup
+            .number()
+            .min(1)
+            .positive('Number must be positive')
+            .required('required'),
+        amount: yup
+            .number()
+            .min(1)
+            .positive('Number must be positive')
+            .required('required'),
+        totalAmount: yup
+            .number()
+            .min(1)
+            .positive('Number must be positive')
+            .required('required'),
         user_id: '',
         status: ''
     })
@@ -118,6 +157,61 @@ const Invoice = () => {
             setIsLoadingClient(true)
         }
     }
+
+    const handleSearchProduct = async (min, max, brand, page, limit) => {
+        const queryParameters = {}
+
+        const minPrice = 1
+        const maxPrice = 10000000
+        const itemName = ''
+        const pageNumber = 1
+        const pageSize = 10
+
+        if (minPrice !== '') {
+            queryParameters.minPrice = minPrice
+        }
+        if (maxPrice !== '') {
+            queryParameters.maxPrice = maxPrice
+        }
+
+        if (itemName !== '') {
+            queryParameters.itemName = itemName
+        }
+
+        if (pageNumber) {
+            queryParameters.page = pageNumber
+        }
+
+        if (pageSize) {
+            queryParameters.limit = pageSize
+        }
+
+        const url = new URL('http://localhost:8888/api/search/')
+
+        for (const param in queryParameters) {
+            url.searchParams.append(param, queryParameters[param])
+        }
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET'
+            })
+
+            if (response.ok) {
+                const newSearch = await response.json()
+
+                setItemsObject(newSearch)
+            } else {
+                console.error('Error:', response.status)
+            }
+        } catch (error) {
+            console.error('Error:', error)
+        }
+    }
+
+    useEffect(() => {
+        handleSearchProduct()
+    }, [])
 
     const debounce = (submit, delay, value) => {
         let timeoutID
@@ -234,7 +328,6 @@ const Invoice = () => {
                                         <div className=' min-w-3/3 flex h-fit max-h-[180px]  w-2/3 flex-col items-center overflow-auto rounded-md  border-2 border-gray-600  bg-base-300 p-2'>
                                             {searchResultClient.map((elem) => {
                                                 if (elem) {
-                                                    console.log(elem)
                                                     return (
                                                         <div
                                                             onMouseEnter={(
@@ -336,7 +429,6 @@ const Invoice = () => {
                                     )}
                                     {errorText(errors.client, touched.client)}
                                 </div>
-                                {console.log(values)}
                             </div>
 
                             <div className='flex flex-col gap-3 px-2'>
@@ -423,7 +515,7 @@ const Invoice = () => {
                                 <div className='flex w-1/2 flex-col'>
                                     <label
                                         className='text-sm font-semibold text-neutral'
-                                        htmlFor='credit_limit'
+                                        htmlFor='tin'
                                     >
                                         Tin number
                                     </label>
@@ -442,10 +534,141 @@ const Invoice = () => {
                                     {errorText(errors.tin, touched.tin)}
                                 </div>
                             </div>
-                            <div className='border-red flex w-full items-center border-2 p-2'>
-                                <div className='sat'></div>
+                            <div className='border-red flex w-full flex-col border-2 p-2'>
+                                <div className='sat'>
+                                    <Search
+                                        setItems={setItemsObject}
+                                        items={itemsObject}
+                                        searchFunction={handleSearchProduct}
+                                    />
+                                </div>
+                                <div className='flex'>
+                                    <div className='w-full'>
+                                        <label
+                                            className='text-sm font-semibold text-neutral'
+                                            htmlFor='description'
+                                        >
+                                            Description
+                                        </label>
+                                        <Field
+                                            className={`input-primary input input-sm w-full rounded-sm text-primary ${
+                                                errors.description &&
+                                                touched.description
+                                                    ? ' border-red-500 focus:ring-red-500'
+                                                    : ''
+                                            } `}
+                                            name='description'
+                                            type='text'
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            value={values.description}
+                                        />
+                                        {errorText(
+                                            errors.description,
+                                            touched.description
+                                        )}
+                                    </div>
+                                </div>
+                                <div className='flex w-full items-center gap-5 '>
+                                    <div className='flex flex-col'>
+                                        <label
+                                            className='text-sm font-semibold text-neutral'
+                                            htmlFor='quantity'
+                                        >
+                                            Quantity
+                                        </label>
 
-                                <TableForm />
+                                        <Field
+                                            className={`input-primary input input-sm w-full rounded-sm text-primary ${
+                                                errors.quantity &&
+                                                touched.quantity
+                                                    ? ' border-red-500 focus:ring-red-500'
+                                                    : ''
+                                            } `}
+                                            name='quantity'
+                                            type='number'
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            value={values.quantity}
+                                        />
+
+                                        {errorText(
+                                            errors.quantity,
+                                            touched.quantity
+                                        )}
+                                    </div>
+                                    <div className='flex  flex-col'>
+                                        <label
+                                            className='text-sm font-semibold text-neutral'
+                                            htmlFor='unit'
+                                        >
+                                            Unit
+                                        </label>
+                                        <Field
+                                            className={`input-primary input input-sm w-full rounded-sm text-primary ${
+                                                errors.unit && touched.unit
+                                                    ? ' border-red-500 focus:ring-red-500'
+                                                    : ''
+                                            } `}
+                                            name='unit'
+                                            type='text'
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            value={formatNumber(values.unit)}
+                                        />
+                                        {errorText(errors.unit, touched.unit)}
+                                    </div>
+
+                                    <div className='flex  flex-col'>
+                                        <label
+                                            className='text-sm font-semibold text-neutral'
+                                            htmlFor='unitPrice'
+                                        >
+                                            Unit Price
+                                        </label>
+                                        <Field
+                                            className={`input-primary input input-sm w-full rounded-sm text-primary ${
+                                                errors.unitPrice &&
+                                                touched.unitPrice
+                                                    ? ' border-red-500 focus:ring-red-500'
+                                                    : ''
+                                            } `}
+                                            name='unitPrice'
+                                            type='text'
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            value={values.unitPrice}
+                                        />
+                                        {errorText(
+                                            errors.unitPrice,
+                                            touched.unitPrice
+                                        )}
+                                    </div>
+                                </div>
+                                <div className='w-1/2'>
+                                    <label
+                                        className='text-sm font-semibold text-neutral'
+                                        htmlFor='amount'
+                                    >
+                                        Amount
+                                    </label>
+                                    <Field
+                                        className={`input-primary input input-sm w-full rounded-sm text-primary ${
+                                            errors.amount && touched.amount
+                                                ? ' border-red-500 focus:ring-red-500'
+                                                : ''
+                                        } `}
+                                        name='amount'
+                                        type='text'
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        value={values.amount}
+                                    />
+                                    {errorText(errors.amount, touched.amount)}
+                                </div>
+                                <div className='sat'>
+                                    <TableForm />
+                                </div>
                             </div>
                             <p
                                 className={`w-full text-center text-sm text-red-500 ${
