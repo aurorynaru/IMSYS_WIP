@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
 const TableForm = (props) => {
+    const header = props.header
+    const body = props.body
     const [headerArray, setHeader] = useState([])
     const [bodyArray, setBodyArray] = useState([])
     const [headerData, setHeaderData] = useState([])
@@ -32,14 +34,14 @@ const TableForm = (props) => {
     }, [bodyArray])
 
     useEffect(() => {
-        if (props.header != null) {
-            setHeader(props.header)
+        if (header != null) {
+            setHeader(header)
         }
 
-        if (props.body != null && props.body != undefined) {
-            setBodyArray(props.body)
+        if (body != null && body != undefined) {
+            setBodyArray(body)
         }
-    }, [props.header, props.body])
+    }, [header, body])
     console.log(bodyArray)
     return (
         <div className='sat'>

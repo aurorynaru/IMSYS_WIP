@@ -158,14 +158,20 @@ const Invoice = () => {
         }
     }
 
-    const handleSearchProduct = async (min, max, brand, page, limit) => {
+    const handleSearchProduct = async (
+        min = 1,
+        max = 1000,
+        brand = '',
+        page = 1,
+        limit = 10
+    ) => {
         const queryParameters = {}
 
-        const minPrice = 1
-        const maxPrice = 10000000
-        const itemName = ''
-        const pageNumber = 1
-        const pageSize = 10
+        const minPrice = min
+        const maxPrice = max
+        const itemName = brand
+        const pageNumber = page
+        const pageSize = limit
 
         if (minPrice !== '') {
             queryParameters.minPrice = minPrice
@@ -667,7 +673,11 @@ const Invoice = () => {
                                     {errorText(errors.amount, touched.amount)}
                                 </div>
                                 <div className='sat'>
-                                    <TableForm />
+                                    {itemsObject ? (
+                                        <TableForm />
+                                    ) : (
+                                        <span className='loading loading-spinner loading-lg'></span>
+                                    )}
                                 </div>
                             </div>
                             <p

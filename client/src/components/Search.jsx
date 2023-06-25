@@ -5,12 +5,12 @@ import ComboBox from './ComboBox'
 import TableForm from './TableForm'
 
 const Search = (props) => {
-    const { items, totalItems, currentPage, totalPages } = props
+    const { items, searchFunction } = props
     const [minPrice, setMinPrice] = useState(0)
     const [maxPrice, setMaxPrice] = useState(0)
     const [desc, setDesc] = useState(0)
     const [brand, setBrand] = useState(0)
-    const itemsArray = []
+    console.log(props)
     const headerArray = ['Quantity', 'Brand', 'Description', 'price']
     return (
         <div className='w-full'>
@@ -27,6 +27,11 @@ const Search = (props) => {
                         name='minPrice'
                         type='number'
                         value={minPrice}
+                        onChange={(event) => {
+                            const value = event.target.value
+                            setMinPrice(value)
+                            searchFunction(value)
+                        }}
                     />
                 </div>
                 <div className='w-3/12'>
@@ -50,7 +55,11 @@ const Search = (props) => {
                     <ComboBox />
                 </div>
             </div>
-            <TableForm body={items.items} header={headerArray} />
+            {items ? (
+                <TableForm body={items.items} header={headerArray} />
+            ) : (
+                <span className='loading loading-spinner loading-lg'></span>
+            )}
         </div>
     )
 }
