@@ -5,13 +5,20 @@ import ComboBox from './ComboBox'
 import TableForm from './TableForm'
 
 const Search = (props) => {
-    const { items, searchFunction } = props
-    const [minPrice, setMinPrice] = useState(0)
-    const [maxPrice, setMaxPrice] = useState(0)
-    const [desc, setDesc] = useState(0)
-    const [brand, setBrand] = useState(0)
-    console.log(props)
-    const headerArray = ['Quantity', 'Brand', 'Description', 'price']
+    const {
+        items,
+        searchFunction,
+        minPrice,
+        maxPrice,
+        minFunction,
+        maxFunction,
+        sortPrice,
+        sortPriceFunction,
+        sortQuantity,
+        sortQuantityFunction
+    } = props
+    const headerArray = ['Quantity', 'Brand', 'Description', 'Price']
+
     return (
         <div className='w-full'>
             <div className='flex items-center gap-2 border-2 border-white p-2'>
@@ -29,8 +36,7 @@ const Search = (props) => {
                         value={minPrice}
                         onChange={(event) => {
                             const value = event.target.value
-                            setMinPrice(value)
-                            searchFunction(value)
+                            minFunction(value)
                         }}
                     />
                 </div>
@@ -46,6 +52,10 @@ const Search = (props) => {
                         name='maxPrice'
                         type='number'
                         value={maxPrice}
+                        onChange={(event) => {
+                            const value = event.target.value
+                            maxFunction(value)
+                        }}
                     />
                 </div>
                 <div className=''>
@@ -56,7 +66,14 @@ const Search = (props) => {
                 </div>
             </div>
             {items ? (
-                <TableForm body={items.items} header={headerArray} />
+                <TableForm
+                    body={items.items}
+                    header={headerArray}
+                    sortPrice={sortPrice}
+                    sortPriceFunction={sortPriceFunction}
+                    sortQuantity={sortQuantity}
+                    sortQuantityFunction={sortQuantityFunction}
+                />
             ) : (
                 <span className='loading loading-spinner loading-lg'></span>
             )}

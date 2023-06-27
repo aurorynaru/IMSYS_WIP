@@ -26,7 +26,18 @@ export const registerProduct = async (req, res) => {
 
 export const searchProduct = async (req, res) => {
     try {
-        const { minPrice, maxPrice, brand, page, limit, desc } = req.query
+        const {
+            minPrice,
+            maxPrice,
+            brand,
+            page,
+            limit,
+            desc,
+            sortPrice,
+            sortQuantity,
+            sortBrand,
+            sortDesc
+        } = req.query
 
         const pageNumber = parseInt(page) || 1
         const limitNumber = parseInt(limit) || 10
@@ -53,10 +64,37 @@ export const searchProduct = async (req, res) => {
             filters.desc = desc
         }
 
+        let sortCriteria = {}
+
+        if (sortPrice === 'desc' && sortPrice != '') {
+            sortCriteria.price = -1
+        } else if (sortPrice === 'asc') {
+            sortCriteria.price = 1
+        }
+
+        if (sortQuantity === 'desc' && sortQuantity != '') {
+            sortCriteria.quantity = -1
+        } else if (sortQuantity === 'asc') {
+            sortCriteria.quantity = 1
+        }
+
+        if (sortBrand === 'desc' && sortBrand != '') {
+            sortCriteria.sortBrand = -1
+        } else if (sortBrand === 'asc') {
+            sortCriteria.sortBrand = 1
+        }
+
+        if (sortDesc === 'desc' && sortDesc != '') {
+            sortCriteria.sortDesc = -1
+        } else if (sortDesc === 'asc') {
+            sortCriteria.sortDesc = 1
+        }
+
         const countPromise = Product.countDocuments(filters)
-        const itemsPromise = Product.find(filters)
+        let itemsPromise = Product.find(filters)
             .skip((pageNumber - 1) * limitNumber)
             .limit(limitNumber)
+            .sort(sortCriteria)
 
         const [count, items] = await Promise.all([countPromise, itemsPromise])
 

@@ -3,6 +3,13 @@ import React, { useEffect, useState } from 'react'
 const TableForm = (props) => {
     const header = props.header
     const body = props.body
+    const {
+        sortPrice,
+        sortPriceFunction,
+        sortQuantityFunction,
+        sortBrandFunction,
+        sortDescFunction
+    } = props
     const [headerArray, setHeader] = useState([])
     const [bodyArray, setBodyArray] = useState([])
     const [headerData, setHeaderData] = useState([])
@@ -11,7 +18,73 @@ const TableForm = (props) => {
     useEffect(() => {
         if (headerArray.length > 0) {
             const updatedHeaderData = headerArray.map((header) => {
-                return <th key={header}>{header}</th>
+                if (header === 'Price') {
+                    return (
+                        <th
+                            className='cursor-pointer hover:font-bold'
+                            onClick={() => {
+                                sortQuantityFunction('')
+                                sortPriceFunction((prev) =>
+                                    prev === 'desc' ? 'asc' : 'desc'
+                                )
+                            }}
+                            key={header}
+                        >
+                            {header}
+                        </th>
+                    )
+                }
+
+                if (header === 'Quantity') {
+                    return (
+                        <th
+                            className='cursor-pointer hover:font-bold'
+                            onClick={() => {
+                                sortPriceFunction('')
+                                sortQuantityFunction((prev) =>
+                                    prev === 'desc' ? 'asc' : 'desc'
+                                )
+                            }}
+                            key={header}
+                        >
+                            {header}
+                        </th>
+                    )
+                }
+
+                if (header === 'Brand') {
+                    return (
+                        <th
+                            className='cursor-pointer hover:font-bold'
+                            onClick={() => {
+                                sortPriceFunction('')
+                                sortQuantityFunction((prev) =>
+                                    prev === 'desc' ? 'asc' : 'desc'
+                                )
+                            }}
+                            key={header}
+                        >
+                            {header}
+                        </th>
+                    )
+                }
+
+                if (header === 'Description') {
+                    return (
+                        <th
+                            className='cursor-pointer hover:font-bold'
+                            onClick={() => {
+                                sortPriceFunction('')
+                                sortQuantityFunction((prev) =>
+                                    prev === 'desc' ? 'asc' : 'desc'
+                                )
+                            }}
+                            key={header}
+                        >
+                            {header}
+                        </th>
+                    )
+                }
             })
             setHeaderData(updatedHeaderData)
         }
@@ -42,7 +115,7 @@ const TableForm = (props) => {
             setBodyArray(body)
         }
     }, [header, body])
-    console.log(bodyArray)
+    console.log(sortPrice)
     return (
         <div className='sat'>
             <div className='w-full overflow-auto'>

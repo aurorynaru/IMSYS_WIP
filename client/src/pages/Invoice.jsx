@@ -33,6 +33,17 @@ const Invoice = () => {
     const [unitPrice, setUnitPrice] = useState(0)
     const [amount, setAmount] = useState(0)
 
+    //pagination
+    const [min, setMin] = useState(0)
+    const [max, setMax] = useState(1000)
+    const [brand, setBrand] = useState('')
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState(10)
+    const [sortPagePrice, setSortPagePrice] = useState('')
+    const [sortPageQuantity, setSortPageQuantity] = useState('')
+    const [sortPageBrandName, setSortPageBrandName] = useState('')
+    const [sortPageDesc, setSortPageDesc] = useState('')
+
     const initialValues = {
         invoice_number: '',
         credit_limit: '',
@@ -158,13 +169,7 @@ const Invoice = () => {
         }
     }
 
-    const handleSearchProduct = async (
-        min = 1,
-        max = 1000,
-        brand = '',
-        page = 1,
-        limit = 10
-    ) => {
+    const handleSearchProduct = async () => {
         const queryParameters = {}
 
         const minPrice = min
@@ -192,6 +197,22 @@ const Invoice = () => {
             queryParameters.limit = pageSize
         }
 
+        if (sortPageQuantity) {
+            queryParameters.sortQuantity = sortPageQuantity
+        }
+
+        if (sortPagePrice) {
+            queryParameters.sortPrice = sortPagePrice
+        }
+
+        if (sortPageBrandName) {
+            queryParameters.sortBrand = sortPageBrandName
+        }
+
+        if (sortPageDesc) {
+            queryParameters.sortDesc = sortPageDesc
+        }
+
         const url = new URL('http://localhost:8888/api/search/')
 
         for (const param in queryParameters) {
@@ -217,7 +238,7 @@ const Invoice = () => {
 
     useEffect(() => {
         handleSearchProduct()
-    }, [])
+    }, [min, max, page, brand, limit, sortPagePrice, sortPageQuantity])
 
     const debounce = (submit, delay, value) => {
         let timeoutID
@@ -546,6 +567,20 @@ const Invoice = () => {
                                         setItems={setItemsObject}
                                         items={itemsObject}
                                         searchFunction={handleSearchProduct}
+                                        minFunction={setMin}
+                                        minPrice={min}
+                                        maxFunction={setMax}
+                                        maxPrice={max}
+                                        sortPrice={sortPagePrice}
+                                        sortPriceFunction={setSortPagePrice}
+                                        sortQuantity={sortPageQuantity}
+                                        sortQuantityFunction={
+                                            setSortPageQuantity
+                                        }
+                                        sortPageDescFunction={setSortPageDesc}
+                                        sortPageBrandFunction={
+                                            setSortPageBrandName
+                                        }
                                     />
                                 </div>
                                 <div className='flex'>
