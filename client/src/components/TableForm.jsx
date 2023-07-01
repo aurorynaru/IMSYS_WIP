@@ -8,12 +8,33 @@ const TableForm = (props) => {
         sortPriceFunction,
         sortQuantityFunction,
         sortBrandFunction,
-        sortDescFunction
+        sortDescFunction,
+        searchFunction,
+        setFieldValue,
+        setTotalQuantity
     } = props
     const [headerArray, setHeader] = useState([])
     const [bodyArray, setBodyArray] = useState([])
     const [headerData, setHeaderData] = useState([])
     const [bodyData, setBodyData] = useState([])
+
+    const [selectedColumn, setSelectedColumn] = useState(null)
+
+    const resetFunction = (functionName) => {
+        const functionArray = [
+            sortQuantityFunction,
+            sortPriceFunction,
+            sortBrandFunction,
+            sortDescFunction
+        ]
+        functionArray.forEach((func) => {
+            if (func != functionName) {
+                func('')
+            }
+        })
+
+        searchFunction()
+    }
 
     useEffect(() => {
         if (headerArray.length > 0) {
@@ -21,9 +42,9 @@ const TableForm = (props) => {
                 if (header === 'Price') {
                     return (
                         <th
-                            className='cursor-pointer hover:font-bold'
+                            className='cursor-pointer text-primary '
                             onClick={() => {
-                                sortQuantityFunction('')
+                                resetFunction(sortPriceFunction)
                                 sortPriceFunction((prev) =>
                                     prev === 'desc' ? 'asc' : 'desc'
                                 )
@@ -38,9 +59,9 @@ const TableForm = (props) => {
                 if (header === 'Quantity') {
                     return (
                         <th
-                            className='cursor-pointer hover:font-bold'
+                            className='cursor-pointer text-primary '
                             onClick={() => {
-                                sortPriceFunction('')
+                                resetFunction(sortQuantityFunction)
                                 sortQuantityFunction((prev) =>
                                     prev === 'desc' ? 'asc' : 'desc'
                                 )
@@ -55,10 +76,10 @@ const TableForm = (props) => {
                 if (header === 'Brand') {
                     return (
                         <th
-                            className='cursor-pointer hover:font-bold'
+                            className='cursor-pointer text-primary '
                             onClick={() => {
-                                sortPriceFunction('')
-                                sortQuantityFunction((prev) =>
+                                resetFunction(sortBrandFunction)
+                                sortBrandFunction((prev) =>
                                     prev === 'desc' ? 'asc' : 'desc'
                                 )
                             }}
@@ -72,10 +93,10 @@ const TableForm = (props) => {
                 if (header === 'Description') {
                     return (
                         <th
-                            className='cursor-pointer hover:font-bold'
+                            className='cursor-pointer text-primary '
                             onClick={() => {
-                                sortPriceFunction('')
-                                sortQuantityFunction((prev) =>
+                                resetFunction(sortDescFunction)
+                                sortDescFunction((prev) =>
                                     prev === 'desc' ? 'asc' : 'desc'
                                 )
                             }}
@@ -92,19 +113,36 @@ const TableForm = (props) => {
 
     useEffect(() => {
         if (bodyArray.length > 0) {
-            const updatedBodyData = bodyArray.map((body) => {
+            const updatedBodyData = bodyArray.map((body, index) => {
+                const { description, quantity, price, brand } = body
                 return (
-                    <tr key={body._id} className='bg-base-100 text-sm'>
-                        <th>{body.quantity}</th>
-                        <td>{body.brand}</td>
-                        <td className='overflow-auto'>{body.description}</td>
-                        <td>{body.price}</td>
+                    <tr
+                        onClick={() => {
+                            setSelectedColumn(index)
+                            setFieldValue('description', description)
+                            setFieldValue('unitPrice', price)
+                            setFieldValue('quantity', 0)
+                            setFieldValue('unit', '')
+                            setFieldValue('amount', 0)
+                            setTotalQuantity(quantity)
+                        }}
+                        key={body._id}
+                        className={` ${
+                            selectedColumn === index
+                                ? 'bg-neutral'
+                                : 'bg-base-100'
+                        } cursor-pointer text-sm`}
+                    >
+                        <th>{quantity}</th>
+                        <td>{brand}</td>
+                        <td className='overflow-auto'>{description}</td>
+                        <td>{price}</td>
                     </tr>
                 )
             })
             setBodyData(updatedBodyData)
         }
-    }, [bodyArray])
+    }, [bodyArray, selectedColumn])
 
     useEffect(() => {
         if (header != null) {
@@ -115,7 +153,7 @@ const TableForm = (props) => {
             setBodyArray(body)
         }
     }, [header, body])
-    console.log(sortPrice)
+
     return (
         <div className='sat'>
             <div className='w-full overflow-auto'>

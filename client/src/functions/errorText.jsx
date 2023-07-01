@@ -3,7 +3,7 @@ import { tailwindError } from '../tailwindcss'
 export const errorText = (errors, touched) => {
     return (
         <p
-            className={` ${tailwindError} ${
+            className={` ${tailwindError}  ${
                 errors && touched ? '' : 'invisible'
             }`}
         >

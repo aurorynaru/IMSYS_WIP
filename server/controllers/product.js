@@ -40,7 +40,7 @@ export const searchProduct = async (req, res) => {
         } = req.query
 
         const pageNumber = parseInt(page) || 1
-        const limitNumber = parseInt(limit) || 10
+        const limitNumber = parseInt(limit) || 1
 
         const filters = {}
 
@@ -57,11 +57,11 @@ export const searchProduct = async (req, res) => {
         }
 
         if (brand) {
-            filters.brand = brand
+            filters.brand = { $regex: brand, $options: 'i' }
         }
 
         if (desc) {
-            filters.desc = desc
+            filters.description = { $regex: desc, $options: 'i' }
         }
 
         let sortCriteria = {}
@@ -79,15 +79,15 @@ export const searchProduct = async (req, res) => {
         }
 
         if (sortBrand === 'desc' && sortBrand != '') {
-            sortCriteria.sortBrand = -1
+            sortCriteria.brand = 'desc'
         } else if (sortBrand === 'asc') {
-            sortCriteria.sortBrand = 1
+            sortCriteria.brand = 'asc'
         }
 
         if (sortDesc === 'desc' && sortDesc != '') {
-            sortCriteria.sortDesc = -1
+            sortCriteria.description = 'desc'
         } else if (sortDesc === 'asc') {
-            sortCriteria.sortDesc = 1
+            sortCriteria.description = 'asc'
         }
 
         const countPromise = Product.countDocuments(filters)
@@ -95,6 +95,7 @@ export const searchProduct = async (req, res) => {
             .skip((pageNumber - 1) * limitNumber)
             .limit(limitNumber)
             .sort(sortCriteria)
+            .collation({ locale: 'en', strength: 1 })
 
         const [count, items] = await Promise.all([countPromise, itemsPromise])
 

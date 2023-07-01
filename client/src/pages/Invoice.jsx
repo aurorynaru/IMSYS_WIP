@@ -32,17 +32,24 @@ const Invoice = () => {
     const [description, setDescription] = useState('')
     const [unitPrice, setUnitPrice] = useState(0)
     const [amount, setAmount] = useState(0)
+    const [selectedItems, setSelectedItems] = useState([])
 
     //pagination
     const [min, setMin] = useState(0)
     const [max, setMax] = useState(1000)
     const [brand, setBrand] = useState('')
+    const [desc, setDesc] = useState('')
     const [page, setPage] = useState(1)
     const [limit, setLimit] = useState(10)
     const [sortPagePrice, setSortPagePrice] = useState('')
     const [sortPageQuantity, setSortPageQuantity] = useState('')
     const [sortPageBrandName, setSortPageBrandName] = useState('')
     const [sortPageDesc, setSortPageDesc] = useState('')
+    const [totalQuantity, setTotalQuantity] = useState(0)
+
+    //search
+    const [brandNameSearch, setBrandNameSearch] = useState('')
+    const [descSearch, setDescSearch] = useState('')
 
     const initialValues = {
         invoice_number: '',
@@ -79,7 +86,7 @@ const Invoice = () => {
         date_created: yup.date().required('required'),
         terms: yup.number(),
         recipient: yup.string().required('required'),
-        vatable_sales: yup.number().positive('Number must be positive'),
+        vatable_sales: yup.number().positive('Must be greater than 0'),
         tin: yup
             .string()
             .min(15, 'Tin number must be at least 12 numbers.')
@@ -88,50 +95,53 @@ const Invoice = () => {
         vat: yup
             .number()
             .min(7)
-            .positive('Number must be positive')
+            .positive('Must be greater than 0')
             .required('required'),
         total_sales_vat_inclusive: yup
             .number()
             .min(2)
-            .positive('Number must be positive')
+            .positive('Must be greater than 0')
             .required('required'),
         less_vat: yup
             .number()
             .min(2)
-            .positive('Number must be positive')
+            .positive('Must be greater than 0')
             .required('required'),
         net_vat: yup
             .number()
             .min(2)
-            .positive('Number must be positive')
+            .positive('Must be greater than 0')
             .required('required'),
         total_amount_due: yup
             .number()
             .min(2)
-            .positive('Number must be positive')
+            .positive('Must be greater than 0')
             .required('required'),
         itemsObject: yup.object().required('required'),
         quantity: yup
             .number()
             .min(1)
-            .positive('Number must be positive')
+            .test('lessThan', 'Insufficient supply', function (value) {
+                return value <= totalQuantity
+            })
+            .positive('Must be greater than 0')
             .required('required'),
         unit: yup.string().required('required'),
         description: yup.string().required('required'),
         unitPrice: yup
             .number()
             .min(1)
-            .positive('Number must be positive')
+            .positive('Must be greater than 0')
             .required('required'),
         amount: yup
             .number()
             .min(1)
-            .positive('Number must be positive')
+            .positive('Must be greater than 0')
             .required('required'),
         totalAmount: yup
             .number()
             .min(1)
-            .positive('Number must be positive')
+            .positive('Must be greater than 0')
             .required('required'),
         user_id: '',
         status: ''
@@ -176,7 +186,7 @@ const Invoice = () => {
         const maxPrice = max
         const itemName = brand
         const pageNumber = page
-        const pageSize = limit
+        const pageSize = 10
 
         if (minPrice !== '') {
             queryParameters.minPrice = minPrice
@@ -186,7 +196,10 @@ const Invoice = () => {
         }
 
         if (itemName !== '') {
-            queryParameters.itemName = itemName
+            queryParameters.brand = itemName
+        }
+        if (desc !== '') {
+            queryParameters.desc = desc
         }
 
         if (pageNumber) {
@@ -238,8 +251,18 @@ const Invoice = () => {
 
     useEffect(() => {
         handleSearchProduct()
-    }, [min, max, page, brand, limit, sortPagePrice, sortPageQuantity])
-
+    }, [
+        min,
+        max,
+        page,
+        brand,
+        desc,
+        limit,
+        sortPagePrice,
+        sortPageQuantity,
+        sortPageDesc,
+        sortPageBrandName
+    ])
     const debounce = (submit, delay, value) => {
         let timeoutID
 
@@ -566,7 +589,10 @@ const Invoice = () => {
                                     <Search
                                         setItems={setItemsObject}
                                         items={itemsObject}
+                                        setPage={setPage}
                                         searchFunction={handleSearchProduct}
+                                        setBrand={setBrand}
+                                        setDesc={setDesc}
                                         minFunction={setMin}
                                         minPrice={min}
                                         maxFunction={setMax}
@@ -577,10 +603,14 @@ const Invoice = () => {
                                         sortQuantityFunction={
                                             setSortPageQuantity
                                         }
-                                        sortPageDescFunction={setSortPageDesc}
-                                        sortPageBrandFunction={
-                                            setSortPageBrandName
-                                        }
+                                        sortDescFunction={setSortPageDesc}
+                                        sortBrandFunction={setSortPageBrandName}
+                                        brandNameSearch={brandNameSearch}
+                                        setBrandNameSearch={setBrandNameSearch}
+                                        descSearch={descSearch}
+                                        setDescSearch={setDescSearch}
+                                        setFieldValue={setFieldValue}
+                                        setTotalQuantity={setTotalQuantity}
                                     />
                                 </div>
                                 <div className='flex'>
@@ -611,7 +641,7 @@ const Invoice = () => {
                                     </div>
                                 </div>
                                 <div className='flex w-full items-center gap-5 '>
-                                    <div className='flex flex-col'>
+                                    <div className='flex  flex-col'>
                                         <label
                                             className='text-sm font-semibold text-neutral'
                                             htmlFor='quantity'
@@ -621,14 +651,23 @@ const Invoice = () => {
 
                                         <Field
                                             className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                                errors.quantity &&
-                                                touched.quantity
+                                                errors.quantity
                                                     ? ' border-red-500 focus:ring-red-500'
                                                     : ''
                                             } `}
                                             name='quantity'
                                             type='number'
-                                            onChange={handleChange}
+                                            onChange={(event) => {
+                                                const value = event.target.value
+                                                const price = values.unitPrice
+
+                                                const totalAmt = value * price
+                                                setFieldValue(
+                                                    'amount',
+                                                    totalAmt
+                                                )
+                                                setFieldValue('quantity', value)
+                                            }}
                                             onBlur={handleBlur}
                                             value={values.quantity}
                                         />
@@ -655,7 +694,7 @@ const Invoice = () => {
                                             type='text'
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            value={formatNumber(values.unit)}
+                                            value={values.unit}
                                         />
                                         {errorText(errors.unit, touched.unit)}
                                     </div>
@@ -686,7 +725,8 @@ const Invoice = () => {
                                         )}
                                     </div>
                                 </div>
-                                <div className='w-1/2'>
+                                {console.log(values.amount)}
+                                <div className='w-1/3'>
                                     <label
                                         className='text-sm font-semibold text-neutral'
                                         htmlFor='amount'
@@ -707,6 +747,39 @@ const Invoice = () => {
                                     />
                                     {errorText(errors.amount, touched.amount)}
                                 </div>
+                                <div className='flex w-full items-center justify-center'>
+                                    <button
+                                        type='button'
+                                        onClick={() => {
+                                            const obj = {}
+
+                                            if (
+                                                values.description &&
+                                                values.unitPrice &&
+                                                values.quantity &&
+                                                values.unit &&
+                                                values.amount
+                                            ) {
+                                                obj.description =
+                                                    values.description
+                                                obj.unitPrice = values.unitPrice
+                                                obj.quantity = values.quantity
+                                                obj.unit = values.unit
+                                                obj.amount = values.amount
+
+                                                setSelectedItems((prev) => {
+                                                    const arr = [obj]
+
+                                                    return [...prev, ...arr]
+                                                })
+                                            }
+                                        }}
+                                        className='btn-neutral btn-active btn-wide btn-sm btn hover:text-secondary'
+                                    >
+                                        Add Item
+                                    </button>
+                                </div>
+                                {console.log(selectedItems)}
                                 <div className='sat'>
                                     {itemsObject ? (
                                         <TableForm />
