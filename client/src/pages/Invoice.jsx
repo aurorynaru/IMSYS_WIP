@@ -14,11 +14,15 @@ import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
 import { errorText } from '../functions/errorText'
 import TableForm from '../components/TableForm'
 import Search from '../components/Search'
+import { tailwindError } from '../tailwindcss'
+import Table from '../components/Table'
 
 const Invoice = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const headerArray = ['Quantity', 'Brand', 'Description', 'Price']
     const [resError, setResError] = useState('')
+    const [errorItem, setErrorItem] = useState(false)
 
     //supplier
     const [isLoadingClient, setIsLoadingClient] = useState(false)
@@ -584,7 +588,7 @@ const Invoice = () => {
                                     {errorText(errors.tin, touched.tin)}
                                 </div>
                             </div>
-                            <div className='border-red flex w-full flex-col border-2 p-2'>
+                            <div className=' flex w-full flex-col '>
                                 <div className='sat'>
                                     <Search
                                         setItems={setItemsObject}
@@ -611,178 +615,240 @@ const Invoice = () => {
                                         setDescSearch={setDescSearch}
                                         setFieldValue={setFieldValue}
                                         setTotalQuantity={setTotalQuantity}
+                                        headerArray={headerArray}
                                     />
                                 </div>
-                                <div className='flex'>
-                                    <div className='w-full'>
-                                        <label
-                                            className='text-sm font-semibold text-neutral'
-                                            htmlFor='description'
-                                        >
-                                            Description
-                                        </label>
-                                        <Field
-                                            className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                                errors.description &&
+                                <div className='border-2 border-primary p-2'>
+                                    <div className='flex'>
+                                        <div className='w-full'>
+                                            <label
+                                                className='text-sm font-semibold text-neutral'
+                                                htmlFor='description'
+                                            >
+                                                Description
+                                            </label>
+                                            <Field
+                                                className={`input-primary input input-sm w-full rounded-sm text-primary ${
+                                                    errors.description &&
+                                                    touched.description
+                                                        ? ' border-red-500 focus:ring-red-500'
+                                                        : ''
+                                                } `}
+                                                name='description'
+                                                type='text'
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                value={values.description}
+                                            />
+                                            {errorText(
+                                                errors.description,
                                                 touched.description
-                                                    ? ' border-red-500 focus:ring-red-500'
-                                                    : ''
-                                            } `}
-                                            name='description'
-                                            type='text'
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            value={values.description}
-                                        />
-                                        {errorText(
-                                            errors.description,
-                                            touched.description
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className='flex w-full items-center gap-5 '>
-                                    <div className='flex  flex-col'>
-                                        <label
-                                            className='text-sm font-semibold text-neutral'
-                                            htmlFor='quantity'
-                                        >
-                                            Quantity
-                                        </label>
+                                    <div className='flex w-full items-center gap-5 '>
+                                        <div className='flex  flex-col'>
+                                            <label
+                                                className='text-sm font-semibold text-neutral'
+                                                htmlFor='quantity'
+                                            >
+                                                Quantity
+                                            </label>
 
-                                        <Field
-                                            className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                                errors.quantity
-                                                    ? ' border-red-500 focus:ring-red-500'
-                                                    : ''
-                                            } `}
-                                            name='quantity'
-                                            type='number'
-                                            onChange={(event) => {
-                                                const value = event.target.value
-                                                const price = values.unitPrice
+                                            <Field
+                                                className={`input-primary input input-sm w-full rounded-sm text-primary ${
+                                                    errors.quantity
+                                                        ? ' border-red-500 focus:ring-red-500'
+                                                        : ''
+                                                } `}
+                                                name='quantity'
+                                                type='number'
+                                                onChange={(event) => {
+                                                    const value =
+                                                        event.target.value
+                                                    const price =
+                                                        values.unitPrice
 
-                                                const totalAmt = value * price
-                                                setFieldValue(
-                                                    'amount',
-                                                    totalAmt
-                                                )
-                                                setFieldValue('quantity', value)
-                                            }}
-                                            onBlur={handleBlur}
-                                            value={values.quantity}
-                                        />
+                                                    const totalAmt =
+                                                        value * price
+                                                    setFieldValue(
+                                                        'amount',
+                                                        totalAmt
+                                                    )
+                                                    setFieldValue(
+                                                        'quantity',
+                                                        value
+                                                    )
+                                                }}
+                                                onBlur={handleBlur}
+                                                value={values.quantity}
+                                            />
 
-                                        {errorText(
-                                            errors.quantity,
-                                            touched.quantity
-                                        )}
-                                    </div>
-                                    <div className='flex  flex-col'>
-                                        <label
-                                            className='text-sm font-semibold text-neutral'
-                                            htmlFor='unit'
-                                        >
-                                            Unit
-                                        </label>
-                                        <Field
-                                            className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                                errors.unit && touched.unit
-                                                    ? ' border-red-500 focus:ring-red-500'
-                                                    : ''
-                                            } `}
-                                            name='unit'
-                                            type='text'
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            value={values.unit}
-                                        />
-                                        {errorText(errors.unit, touched.unit)}
-                                    </div>
+                                            {errorText(
+                                                errors.quantity,
+                                                touched.quantity
+                                            )}
+                                        </div>
+                                        <div className='flex  flex-col'>
+                                            <label
+                                                className='text-sm font-semibold text-neutral'
+                                                htmlFor='unit'
+                                            >
+                                                Unit
+                                            </label>
+                                            <Field
+                                                className={`input-primary input input-sm w-full rounded-sm text-primary ${
+                                                    errors.unit && touched.unit
+                                                        ? ' border-red-500 focus:ring-red-500'
+                                                        : ''
+                                                } `}
+                                                name='unit'
+                                                type='text'
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                value={values.unit}
+                                            />
+                                            {errorText(
+                                                errors.unit,
+                                                touched.unit
+                                            )}
+                                        </div>
 
-                                    <div className='flex  flex-col'>
-                                        <label
-                                            className='text-sm font-semibold text-neutral'
-                                            htmlFor='unitPrice'
-                                        >
-                                            Unit Price
-                                        </label>
-                                        <Field
-                                            className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                                errors.unitPrice &&
+                                        <div className='flex  flex-col'>
+                                            <label
+                                                className='text-sm font-semibold text-neutral'
+                                                htmlFor='unitPrice'
+                                            >
+                                                Unit Price
+                                            </label>
+                                            <Field
+                                                className={`input-primary input input-sm w-full rounded-sm text-primary ${
+                                                    errors.unitPrice &&
+                                                    touched.unitPrice
+                                                        ? ' border-red-500 focus:ring-red-500'
+                                                        : ''
+                                                } `}
+                                                name='unitPrice'
+                                                type='text'
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                value={values.unitPrice}
+                                            />
+                                            {errorText(
+                                                errors.unitPrice,
                                                 touched.unitPrice
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className='w-1/3'>
+                                        <label
+                                            className='text-sm font-semibold text-neutral'
+                                            htmlFor='amount'
+                                        >
+                                            Amount
+                                        </label>
+                                        <Field
+                                            className={`input-primary input input-sm w-full rounded-sm text-primary ${
+                                                errors.amount && touched.amount
                                                     ? ' border-red-500 focus:ring-red-500'
                                                     : ''
                                             } `}
-                                            name='unitPrice'
+                                            name='amount'
                                             type='text'
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            value={values.unitPrice}
+                                            value={values.amount}
                                         />
                                         {errorText(
-                                            errors.unitPrice,
-                                            touched.unitPrice
+                                            errors.amount,
+                                            touched.amount
                                         )}
                                     </div>
-                                </div>
-                                {console.log(values.amount)}
-                                <div className='w-1/3'>
-                                    <label
-                                        className='text-sm font-semibold text-neutral'
-                                        htmlFor='amount'
-                                    >
-                                        Amount
-                                    </label>
-                                    <Field
-                                        className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                            errors.amount && touched.amount
-                                                ? ' border-red-500 focus:ring-red-500'
-                                                : ''
-                                        } `}
-                                        name='amount'
-                                        type='text'
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        value={values.amount}
-                                    />
-                                    {errorText(errors.amount, touched.amount)}
-                                </div>
-                                <div className='flex w-full items-center justify-center'>
-                                    <button
-                                        type='button'
-                                        onClick={() => {
-                                            const obj = {}
+                                    {errorItem && (
+                                        <p
+                                            className={` ${tailwindError} my-2 text-center`}
+                                        >
+                                            Incomplete values / Invalid values
+                                        </p>
+                                    )}
+                                    <div className='flex w-full items-center justify-center'>
+                                        <button
+                                            type='button'
+                                            onClick={() => {
+                                                const obj = {}
+                                                if (
+                                                    errors.quantity ||
+                                                    errors.amount ||
+                                                    errors.description ||
+                                                    errors.unit ||
+                                                    errors.unitPrice
+                                                ) {
+                                                    setErrorItem(true)
+                                                    return
+                                                }
+                                                if (
+                                                    values.description &&
+                                                    values.unitPrice &&
+                                                    values.quantity &&
+                                                    values.unit &&
+                                                    values.amount
+                                                ) {
+                                                    const isMatch =
+                                                        selectedItems.find(
+                                                            (item) =>
+                                                                item.description ===
+                                                                values.description
+                                                        )
+                                                    if (!isMatch) {
+                                                        obj.description =
+                                                            values.description
+                                                        obj.unitPrice =
+                                                            values.unitPrice
+                                                        obj.quantity =
+                                                            values.quantity
+                                                        obj.unit = values.unit
+                                                        obj.amount =
+                                                            values.amount
+                                                        setErrorItem(false)
+                                                        setSelectedItems(
+                                                            (prev) => {
+                                                                const arr = [
+                                                                    obj
+                                                                ]
 
-                                            if (
-                                                values.description &&
-                                                values.unitPrice &&
-                                                values.quantity &&
-                                                values.unit &&
-                                                values.amount
-                                            ) {
-                                                obj.description =
-                                                    values.description
-                                                obj.unitPrice = values.unitPrice
-                                                obj.quantity = values.quantity
-                                                obj.unit = values.unit
-                                                obj.amount = values.amount
-
-                                                setSelectedItems((prev) => {
-                                                    const arr = [obj]
-
-                                                    return [...prev, ...arr]
-                                                })
-                                            }
-                                        }}
-                                        className='btn-neutral btn-active btn-wide btn-sm btn hover:text-secondary'
-                                    >
-                                        Add Item
-                                    </button>
+                                                                return [
+                                                                    ...prev,
+                                                                    ...arr
+                                                                ]
+                                                            }
+                                                        )
+                                                    } else {
+                                                        console.log('duplicate')
+                                                    }
+                                                } else {
+                                                    setErrorItem(true)
+                                                }
+                                            }}
+                                            className='btn-neutral btn-active btn-wide btn-sm btn hover:text-secondary'
+                                        >
+                                            Add Item
+                                        </button>
+                                    </div>
                                 </div>
-                                {console.log(selectedItems)}
                                 <div className='sat'>
                                     {itemsObject ? (
-                                        <TableForm />
+                                        <Table
+                                            headerArray={headerArray}
+                                            setSelectedItems={setSelectedItems}
+                                            selectedItems={selectedItems}
+                                            setFieldValue={setFieldValue}
+                                            unit={values.unit}
+                                            description={values.description}
+                                            quantity={values.quantity}
+                                            unitPrice={unitPrice}
+                                            amount={values.amount}
+                                        />
                                     ) : (
                                         <span className='loading loading-spinner loading-lg'></span>
                                     )}

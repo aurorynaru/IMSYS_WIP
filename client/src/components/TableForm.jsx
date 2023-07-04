@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { background } from '../functions/background'
 
 const TableForm = (props) => {
     const header = props.header
@@ -115,23 +116,29 @@ const TableForm = (props) => {
         if (bodyArray.length > 0) {
             const updatedBodyData = bodyArray.map((body, index) => {
                 const { description, quantity, price, brand } = body
+
                 return (
                     <tr
                         onClick={() => {
-                            setSelectedColumn(index)
-                            setFieldValue('description', description)
-                            setFieldValue('unitPrice', price)
-                            setFieldValue('quantity', 0)
-                            setFieldValue('unit', '')
-                            setFieldValue('amount', 0)
-                            setTotalQuantity(quantity)
+                            if (selectedColumn != body._id) {
+                                setSelectedColumn(body._id)
+                                setFieldValue('description', description)
+                                setFieldValue('unitPrice', price)
+                                setFieldValue('quantity', 0)
+                                setFieldValue('unit', '')
+                                setFieldValue('amount', 0)
+                                setTotalQuantity(quantity)
+                            } else {
+                                setSelectedColumn(null)
+                                setFieldValue('description', '')
+                                setFieldValue('unitPrice', 0)
+                            }
                         }}
                         key={body._id}
                         className={` ${
-                            selectedColumn === index
-                                ? 'bg-neutral'
-                                : 'bg-base-100'
-                        } cursor-pointer text-sm`}
+                            selectedColumn === body._id && 'bg-neutral'
+                        } ${background(index)}
+                       cursor-pointer text-sm`}
                     >
                         <th>{quantity}</th>
                         <td>{brand}</td>

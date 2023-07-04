@@ -27,10 +27,9 @@ const Search = (props) => {
         setDescSearch,
         setPage,
         setFieldValue,
-        setTotalQuantity
+        setTotalQuantity,
+        headerArray
     } = props
-
-    const headerArray = ['Quantity', 'Brand', 'Description', 'Price']
 
     return (
         <div className='w-full'>
