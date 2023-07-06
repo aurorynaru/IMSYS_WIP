@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { background } from '../functions/background'
+import { PencilSquareIcon } from '@heroicons/react/24/outline'
+import { TrashIcon } from '@heroicons/react/24/outline'
 
 const Table = (props) => {
     const [headerArray, setHeader] = useState([
@@ -7,7 +9,9 @@ const Table = (props) => {
         'Unit',
         'Description',
         'Unit Price',
-        'Amount'
+        'Amount',
+        'Buttons',
+        'Delete'
     ])
     const [bodyArray, setBodyArray] = useState([])
     const [headerData, setHeaderData] = useState([])
@@ -25,9 +29,33 @@ const Table = (props) => {
         amount
     } = props
 
+    const deleteItem = (index) => {
+        setSelectedItems((prev) => {
+            const newArr = prev.filter((elem, arrIndex) => {
+                if (index != arrIndex) {
+                    return elem
+                }
+            })
+
+            return newArr
+        })
+    }
+
+    const editItem = (index) => {
+        const { amount, description, quantity, unit, unitPrice } = body[index]
+
+        setFieldValue('description', description)
+        setFieldValue('unit', unit)
+        setFieldValue('quantity', quantity)
+        setFieldValue('unitPrice', unitPrice)
+        setFieldValue('amount', amount)
+
+        deleteItem(index)
+    }
+
     useEffect(() => {
         if (headerArray.length > 0) {
-            const updatedHeaderData = headerArray.map((header) => {
+            const updatedHeaderData = headerArray.map((header, index) => {
                 if (header === 'Quantity') {
                     return (
                         <th
@@ -38,7 +66,6 @@ const Table = (props) => {
                         </th>
                     )
                 }
-
                 if (header === 'Unit') {
                     return (
                         <th
@@ -49,7 +76,6 @@ const Table = (props) => {
                         </th>
                     )
                 }
-
                 if (header === 'Description') {
                     return (
                         <th
@@ -60,7 +86,6 @@ const Table = (props) => {
                         </th>
                     )
                 }
-
                 if (header === 'Unit Price') {
                     return (
                         <th
@@ -81,22 +106,25 @@ const Table = (props) => {
                         </th>
                     )
                 }
+                if (header === 'Buttons') {
+                    return (
+                        <th
+                            className='cursor-pointer text-center text-primary'
+                            key={index}
+                        >
+                            {' '}
+                        </th>
+                    )
+                }
             })
             setHeaderData(updatedHeaderData)
         }
-    }, [headerArray])
+    }, [headerArray, bodyArray])
 
     useEffect(() => {
         if (bodyArray.length > 0) {
             const updatedBodyData = bodyArray.map((body, index) => {
-                const {
-                    description,
-                    quantity,
-                    price,
-                    unit,
-                    unitPrice,
-                    amount
-                } = body
+                const { description, quantity, unit, unitPrice, amount } = body
 
                 return (
                     <tr
@@ -109,7 +137,7 @@ const Table = (props) => {
                         }}
                         key={description}
                         className={` ${
-                            selectedColumn === body._id && 'bg-neutral'
+                            selectedColumn === body._id && 'w-fit bg-neutral'
                         } ${background(index)}
                        cursor-pointer text-sm`}
                     >
@@ -118,13 +146,31 @@ const Table = (props) => {
                         <td className='overflow-auto'>{description}</td>
                         <td className='text-center'>{unitPrice}</td>
                         <td className='text-center'>{amount}</td>
+                        <td
+                            className='tooltip tooltip-top ml-1 before:text-xs'
+                            data-tip='Edit'
+                            onClick={() => {
+                                editItem(index)
+                            }}
+                        >
+                            <PencilSquareIcon className='h-5 w-5   text-neutral transition-transform duration-300 hover:-translate-y-1' />
+                        </td>
+                        <td
+                            onClick={() => {
+                                deleteItem(index)
+                            }}
+                            className='tooltip tooltip-top ml-1 before:text-xs'
+                            data-tip='Delete'
+                        >
+                            <TrashIcon className='h-5 w-5   text-error transition-transform duration-300 hover:-translate-y-1' />
+                        </td>
                     </tr>
                 )
             })
 
             setBodyData(updatedBodyData)
         }
-    }, [bodyArray])
+    }, [bodyArray, bodyArray])
 
     useEffect(() => {
         if (body != null && body != undefined) {
@@ -133,22 +179,20 @@ const Table = (props) => {
     }, [body])
 
     return (
-        <div className='sat'>
+        <div>
             <div className='sat bg-neutral p-2'>
                 <p className='font-bold text-primary'>Items table</p>
             </div>
             {bodyData.length > 0 ? (
-                <div className='sat'>
-                    <div className='w-full overflow-auto'>
-                        <table className='table'>
-                            <thead>
-                                <tr className=' bg-base-200'>
-                                    {headerData ? headerData : <th>yp</th>}
-                                </tr>
-                            </thead>
-                            <tbody>{bodyData}</tbody>
-                        </table>
-                    </div>
+                <div className='w-full overflow-auto'>
+                    <table className='table'>
+                        <thead>
+                            <tr className='w-full bg-base-200'>
+                                {headerData ? headerData : <th>yp</th>}
+                            </tr>
+                        </thead>
+                        <tbody>{bodyData}</tbody>
+                    </table>
                 </div>
             ) : (
                 <div className='flex w-full items-center justify-center bg-base-200 p-2'>

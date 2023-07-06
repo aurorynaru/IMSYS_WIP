@@ -23,6 +23,7 @@ const Invoice = () => {
     const headerArray = ['Quantity', 'Brand', 'Description', 'Price']
     const [resError, setResError] = useState('')
     const [errorItem, setErrorItem] = useState(false)
+    const [totalAmount, setTotalAmount] = useState(0)
 
     //supplier
     const [isLoadingClient, setIsLoadingClient] = useState(false)
@@ -252,6 +253,20 @@ const Invoice = () => {
             console.error('Error:', error)
         }
     }
+
+    useEffect(() => {
+        if (selectedItems.length > 0) {
+            setTotalAmount((prev) => {
+                let amount = 0
+
+                selectedItems.forEach((item) => {
+                    console.log(item)
+                    amount = amount + item.amount
+                })
+                return amount
+            })
+        }
+    }, [selectedItems])
 
     useEffect(() => {
         handleSearchProduct()
@@ -618,7 +633,7 @@ const Invoice = () => {
                                         headerArray={headerArray}
                                     />
                                 </div>
-                                <div className='border-2 border-primary p-2'>
+                                <div className='border-2 border-l-0 border-r-0 border-primary p-2'>
                                     <div className='flex'>
                                         <div className='w-full'>
                                             <label
@@ -823,6 +838,26 @@ const Invoice = () => {
                                                                 ]
                                                             }
                                                         )
+                                                        setFieldValue(
+                                                            'description',
+                                                            ''
+                                                        )
+                                                        setFieldValue(
+                                                            'unit',
+                                                            ' '
+                                                        )
+                                                        setFieldValue(
+                                                            'quantity',
+                                                            0
+                                                        )
+                                                        setFieldValue(
+                                                            'unitPrice',
+                                                            0
+                                                        )
+                                                        setFieldValue(
+                                                            'amount',
+                                                            0
+                                                        )
                                                     } else {
                                                         console.log('duplicate')
                                                     }
@@ -852,6 +887,12 @@ const Invoice = () => {
                                     ) : (
                                         <span className='loading loading-spinner loading-lg'></span>
                                     )}
+
+                                    <div className='sat bg-neutral py-2'>
+                                        <p className='mx-2 text-right font-bold '>
+                                            Total Amount : {totalAmount}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                             <p
