@@ -41,7 +41,8 @@ export const searchClient = async (req, res) => {
                         name: name.name,
                         terms: name.terms,
                         credit_limit: name.credit_limit,
-                        tin: name.tin
+                        tin: name.tin,
+                        credit_used: name.credit_used
                     }
                 }
             })

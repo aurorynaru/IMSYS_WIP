@@ -25,8 +25,6 @@ const Invoice = () => {
     const [resError, setResError] = useState('')
     const [errorItem, setErrorItem] = useState(false)
     const [totalAmount, setTotalAmount] = useState(0)
-    const [createdDate, setCreatedDate] = useState(null)
-    const [dueDate, setDueDate] = useState(null)
 
     //supplier
     const [isLoadingClient, setIsLoadingClient] = useState(false)
@@ -61,7 +59,8 @@ const Invoice = () => {
 
     const initialValues = {
         invoice_number: '',
-        credit_limit: '',
+        credit_limit: 0,
+        credit_used: 0,
         client: '',
         address: '',
         items: [],
@@ -272,8 +271,6 @@ const Invoice = () => {
             })
         }
     }, [selectedItems])
-
-    useEffect(() => {})
 
     useEffect(() => {
         handleSearchProduct()
@@ -621,10 +618,6 @@ const Invoice = () => {
                                                         .toISOString()
                                                         .split('T')[0]
 
-                                                console.log(
-                                                    startDateObject.toISOString()
-                                                )
-
                                                 setFieldValue('terms', value)
 
                                                 setFieldValue(
@@ -701,7 +694,7 @@ const Invoice = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex w-1/2 flex-col gap-3 px-2'>
+                            {/* <div className='flex w-1/2 flex-col gap-3 px-2'>
                                 <label
                                     className='text-sm font-semibold text-neutral'
                                     htmlFor='credit_limit'
@@ -728,7 +721,7 @@ const Invoice = () => {
                                     errors.credit_limit,
                                     touched.credit_limit
                                 )}
-                            </div>
+                            </div> */}
 
                             <div className='flex w-full items-center gap-5 px-2'>
                                 <div className='flex w-1/2 flex-col'>
@@ -1040,7 +1033,10 @@ const Invoice = () => {
                                         </div>
                                     )}
 
-                                    <div className='sat bg-neutral py-2'>
+                                    <div className='flex flex-col gap-5 bg-neutral py-2'>
+                                        <p className='mx-2 text-right font-bold '>
+                                            Credit Limit : {values.credit_limit}
+                                        </p>
                                         <p className='mx-2 text-right font-bold '>
                                             Total Amount : {totalAmount}
                                         </p>

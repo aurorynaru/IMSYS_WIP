@@ -11,6 +11,11 @@ const clientSchema = mongoose.Schema(
             type: Number,
             required: true
         },
+
+        credit_used: {
+            type: Number,
+            required: true
+        },
         terms: {
             type: Number,
             required: true
