@@ -18,6 +18,10 @@ const invoiceSchema = mongoose.Schema(
             type: Date,
             required: true
         },
+        due_Date: {
+            type: Date,
+            required: true
+        },
         terms: {
             type: Number,
             required: true

@@ -16,6 +16,7 @@ import TableForm from '../components/TableForm'
 import Search from '../components/Search'
 import { tailwindError } from '../tailwindcss'
 import Table from '../components/Table'
+const currentDate = new Date()
 
 const Invoice = () => {
     const dispatch = useDispatch()
@@ -24,6 +25,8 @@ const Invoice = () => {
     const [resError, setResError] = useState('')
     const [errorItem, setErrorItem] = useState(false)
     const [totalAmount, setTotalAmount] = useState(0)
+    const [createdDate, setCreatedDate] = useState(null)
+    const [dueDate, setDueDate] = useState(null)
 
     //supplier
     const [isLoadingClient, setIsLoadingClient] = useState(false)
@@ -62,7 +65,8 @@ const Invoice = () => {
         client: '',
         address: '',
         items: [],
-        date_created: '',
+        date_created: currentDate.toISOString().split('T')[0],
+        due_date: '',
         tin: '',
         terms: '',
         recipient: '',
@@ -89,6 +93,7 @@ const Invoice = () => {
         client: yup.string().min(3).max(100).required('required'),
         address: yup.string().required('required'),
         date_created: yup.date().required('required'),
+        due_date: yup.date().required('required'),
         terms: yup.number(),
         recipient: yup.string().required('required'),
         vatable_sales: yup.number().positive('Must be greater than 0'),
@@ -268,6 +273,8 @@ const Invoice = () => {
         }
     }, [selectedItems])
 
+    useEffect(() => {})
+
     useEffect(() => {
         handleSearchProduct()
     }, [
@@ -405,6 +412,21 @@ const Invoice = () => {
                                                                 const text =
                                                                     event.target
                                                                         .innerText
+                                                                const startDateObject =
+                                                                    new Date(
+                                                                        values.date_created
+                                                                    )
+                                                                startDateObject.setDate(
+                                                                    startDateObject.getDate() +
+                                                                        elem.terms
+                                                                )
+
+                                                                const formattedDate =
+                                                                    startDateObject
+                                                                        .toISOString()
+                                                                        .split(
+                                                                            'T'
+                                                                        )[0]
 
                                                                 setFieldValue(
                                                                     'client',
@@ -425,6 +447,11 @@ const Invoice = () => {
                                                                 setFieldValue(
                                                                     'address',
                                                                     elem.address
+                                                                )
+
+                                                                setFieldValue(
+                                                                    'due_date',
+                                                                    formattedDate
                                                                 )
                                                             }}
                                                             onMouseLeave={() => {
@@ -448,6 +475,10 @@ const Invoice = () => {
                                                                     'address',
                                                                     ''
                                                                 )
+                                                                setFieldValue(
+                                                                    'due_date',
+                                                                    ''
+                                                                )
                                                             }}
                                                             onClick={(
                                                                 event
@@ -455,6 +486,22 @@ const Invoice = () => {
                                                                 const text =
                                                                     event.target
                                                                         .innerText
+
+                                                                const startDateObject =
+                                                                    new Date(
+                                                                        values.date_created
+                                                                    )
+                                                                startDateObject.setDate(
+                                                                    startDateObject.getDate() +
+                                                                        elem.terms
+                                                                )
+
+                                                                const formattedDate =
+                                                                    startDateObject
+                                                                        .toISOString()
+                                                                        .split(
+                                                                            'T'
+                                                                        )[0]
 
                                                                 setSearchResultClient(
                                                                     []
@@ -478,6 +525,11 @@ const Invoice = () => {
                                                                 setFieldValue(
                                                                     'address',
                                                                     elem.address
+                                                                )
+
+                                                                setFieldValue(
+                                                                    'due_date',
+                                                                    formattedDate
                                                                 )
                                                             }}
                                                             className=' flex h-fit w-full cursor-pointer  items-center  justify-between rounded-md p-1 text-sm font-medium text-primary hover:bg-neutral hover:text-accent'
@@ -522,6 +574,133 @@ const Invoice = () => {
                                 ></textarea>
                                 {errorText(errors.address, touched.address)}
                             </div>
+                            <div className='mb-2 w-full p-2'>
+                                <div className='flex w-full  justify-end'>
+                                    <div className='w-1/4'>
+                                        <label
+                                            className='tooltip flex items-center text-left text-sm font-semibold text-neutral'
+                                            htmlFor='terms'
+                                        >
+                                            Client Terms
+                                            <span
+                                                className='tooltip  tooltip-right ml-1'
+                                                data-tip='amount in days'
+                                            >
+                                                <ExclamationCircleIcon className='h-5 w-5 text-neutral' />
+                                            </span>
+                                        </label>
+
+                                        <Field
+                                            className={`input-primary input input-sm w-full rounded-sm text-primary ${
+                                                errors.terms && touched.terms
+                                                    ? ' border-red-500 focus:ring-red-500'
+                                                    : ''
+                                            } `}
+                                            name='terms'
+                                            type='number'
+                                            onChange={(event) => {
+                                                let value = parseInt(
+                                                    event.target.value
+                                                )
+
+                                                if (!value) {
+                                                    value = 0
+                                                }
+
+                                                const startDateObject =
+                                                    new Date(
+                                                        values.date_created
+                                                    )
+                                                startDateObject.setDate(
+                                                    startDateObject.getDate() +
+                                                        value
+                                                )
+
+                                                const formattedDate =
+                                                    startDateObject
+                                                        .toISOString()
+                                                        .split('T')[0]
+
+                                                console.log(
+                                                    startDateObject.toISOString()
+                                                )
+
+                                                setFieldValue('terms', value)
+
+                                                setFieldValue(
+                                                    'due_date',
+                                                    formattedDate
+                                                )
+                                            }}
+                                            onBlur={handleBlur}
+                                            value={values.terms}
+                                        />
+
+                                        {errorText(errors.terms, touched.terms)}
+                                    </div>
+                                </div>
+                                <div className='flex w-full items-center justify-between gap-10'>
+                                    <div className='flex w-1/2 flex-col'>
+                                        <label
+                                            className='text-sm font-semibold text-neutral'
+                                            htmlFor='date_created'
+                                        >
+                                            Date
+                                        </label>
+
+                                        <Field
+                                            className={`input-primary input input-sm rounded-sm text-primary ${
+                                                errors.date_created &&
+                                                touched.date_created
+                                                    ? ' border-red-500 focus:ring-red-500'
+                                                    : ''
+                                            } `}
+                                            name='date_created'
+                                            type='date'
+                                            onChange={(event) => {
+                                                const value = event.target.value
+                                                setFieldValue(
+                                                    'date_created',
+                                                    value
+                                                )
+                                                setCreatedDate(value)
+                                            }}
+                                            onBlur={handleBlur}
+                                            value={values.date_created}
+                                        />
+                                    </div>
+
+                                    <div className='flex w-1/2 flex-col'>
+                                        <label
+                                            className='tooltip flex items-center text-left text-sm font-semibold text-neutral'
+                                            htmlFor='terms'
+                                        >
+                                            Due Date
+                                            <span
+                                                className='tooltip  tooltip-right ml-1'
+                                                data-tip='Edit client terms to change'
+                                            >
+                                                <ExclamationCircleIcon className='h-5 w-5 text-neutral' />
+                                            </span>
+                                        </label>
+
+                                        <Field
+                                            className={`input-primary input input-sm cursor-not-allowed rounded-sm  text-primary ${
+                                                errors.due_date &&
+                                                touched.due_date
+                                                    ? ' border-red-500 focus:ring-red-500'
+                                                    : ''
+                                            } `}
+                                            name='due_date'
+                                            type='date'
+                                            readOnly={true}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            value={values.due_date}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                             <div className='flex w-1/2 flex-col gap-3 px-2'>
                                 <label
                                     className='text-sm font-semibold text-neutral'
@@ -552,35 +731,6 @@ const Invoice = () => {
                             </div>
 
                             <div className='flex w-full items-center gap-5 px-2'>
-                                <div className='w-1/2'>
-                                    <label
-                                        className='tooltip flex items-center text-left text-sm font-semibold text-neutral'
-                                        htmlFor='terms'
-                                    >
-                                        Client Terms
-                                        <span
-                                            className='tooltip  tooltip-right ml-1'
-                                            data-tip='amount in days'
-                                        >
-                                            <ExclamationCircleIcon className='h-5 w-5 text-neutral' />
-                                        </span>
-                                    </label>
-
-                                    <Field
-                                        className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                            errors.terms && touched.terms
-                                                ? ' border-red-500 focus:ring-red-500'
-                                                : ''
-                                        } `}
-                                        name='terms'
-                                        type='number'
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        value={values.terms}
-                                    />
-
-                                    {errorText(errors.terms, touched.terms)}
-                                </div>
                                 <div className='flex w-1/2 flex-col'>
                                     <label
                                         className='text-sm font-semibold text-neutral'
@@ -871,7 +1021,7 @@ const Invoice = () => {
                                         </button>
                                     </div>
                                 </div>
-                                <div className='sat'>
+                                <div className=''>
                                     {itemsObject ? (
                                         <Table
                                             headerArray={headerArray}
@@ -885,7 +1035,9 @@ const Invoice = () => {
                                             amount={values.amount}
                                         />
                                     ) : (
-                                        <span className='loading loading-spinner loading-lg'></span>
+                                        <div className='mx-auto my-2 flex w-full items-center justify-center'>
+                                            <span className='loading loading-spinner loading-lg'></span>
+                                        </div>
                                     )}
 
                                     <div className='sat bg-neutral py-2'>

@@ -122,7 +122,9 @@ const Search = (props) => {
                     setTotalQuantity={setTotalQuantity}
                 />
             ) : (
-                <span className='loading loading-spinner loading-lg'></span>
+                <div className='mx-auto my-2 flex w-full items-center justify-center'>
+                    <span className='loading loading-spinner loading-lg'></span>
+                </div>
             )}
 
             {items && (
