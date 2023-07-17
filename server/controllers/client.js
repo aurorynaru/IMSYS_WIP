@@ -11,7 +11,8 @@ export const registerClient = async (req, res) => {
             credit_limit: backToNum,
             terms,
             address,
-            tin
+            tin,
+            credit_used: 0
         })
         const savedClient = await newClient.save()
         res.status(201).json({ client: savedClient })

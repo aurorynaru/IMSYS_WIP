@@ -25,11 +25,12 @@ const Invoice = () => {
     const [resError, setResError] = useState('')
     const [errorItem, setErrorItem] = useState(false)
     const [totalAmount, setTotalAmount] = useState(0)
+    const [totalSalesVat, setTotalSalesVat] = useState(0)
+    const [vat, setVat] = useState(0)
 
     //supplier
     const [isLoadingClient, setIsLoadingClient] = useState(false)
     const [searchResultClient, setSearchResultClient] = useState([])
-    const [ClientValue, setClientValue] = useState('')
 
     // products
     const [itemsObject, setItemsObject] = useState(null)
@@ -42,7 +43,7 @@ const Invoice = () => {
 
     //pagination
     const [min, setMin] = useState(0)
-    const [max, setMax] = useState(1000)
+    const [max, setMax] = useState('')
     const [brand, setBrand] = useState('')
     const [desc, setDesc] = useState('')
     const [page, setPage] = useState(1)
@@ -152,6 +153,7 @@ const Invoice = () => {
             .min(1)
             .positive('Must be greater than 0')
             .required('required'),
+        credit_used: yup.number().required('required'),
         user_id: '',
         status: ''
     })
@@ -264,13 +266,22 @@ const Invoice = () => {
                 let amount = 0
 
                 selectedItems.forEach((item) => {
-                    console.log(item)
                     amount = amount + item.amount
                 })
                 return amount
             })
         }
     }, [selectedItems])
+
+    useEffect(() => {
+        if (totalAmount > 0) {
+            setTotalSalesVat(totalAmount * 0.12 + totalAmount)
+            setVat(totalAmount * 0.12)
+        } else {
+            setTotalSalesVat(0)
+            setVat(0)
+        }
+    }, [totalAmount])
 
     useEffect(() => {
         handleSearchProduct()
@@ -450,6 +461,10 @@ const Invoice = () => {
                                                                     'due_date',
                                                                     formattedDate
                                                                 )
+                                                                setFieldValue(
+                                                                    'credit_used',
+                                                                    elem.credit_used
+                                                                )
                                                             }}
                                                             onMouseLeave={() => {
                                                                 setFieldValue(
@@ -475,6 +490,10 @@ const Invoice = () => {
                                                                 setFieldValue(
                                                                     'due_date',
                                                                     ''
+                                                                )
+                                                                setFieldValue(
+                                                                    'credit_used',
+                                                                    ' '
                                                                 )
                                                             }}
                                                             onClick={(
@@ -527,6 +546,10 @@ const Invoice = () => {
                                                                 setFieldValue(
                                                                     'due_date',
                                                                     formattedDate
+                                                                )
+                                                                setFieldValue(
+                                                                    'credit_used',
+                                                                    elem.credit_used
                                                                 )
                                                             }}
                                                             className=' flex h-fit w-full cursor-pointer  items-center  justify-between rounded-md p-1 text-sm font-medium text-primary hover:bg-neutral hover:text-accent'
@@ -694,35 +717,6 @@ const Invoice = () => {
                                     </div>
                                 </div>
                             </div>
-                            {/* <div className='flex w-1/2 flex-col gap-3 px-2'>
-                                <label
-                                    className='text-sm font-semibold text-neutral'
-                                    htmlFor='credit_limit'
-                                >
-                                    Credit Limit
-                                </label>
-
-                                <Field
-                                    className={`input-primary input input-sm rounded-sm text-primary ${
-                                        errors.credit_limit &&
-                                        touched.credit_limit
-                                            ? ' border-red-500 focus:ring-red-500'
-                                            : ''
-                                    } `}
-                                    name='credit_limit'
-                                    type='text'
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={formatCreditLimit(
-                                        values.credit_limit
-                                    )}
-                                />
-                                {errorText(
-                                    errors.credit_limit,
-                                    touched.credit_limit
-                                )}
-                            </div> */}
-
                             <div className='flex w-full items-center gap-5 px-2'>
                                 <div className='flex w-1/2 flex-col'>
                                     <label
@@ -774,6 +768,7 @@ const Invoice = () => {
                                         setFieldValue={setFieldValue}
                                         setTotalQuantity={setTotalQuantity}
                                         headerArray={headerArray}
+                                        credit_used={values.credit_used}
                                     />
                                 </div>
                                 <div className='border-2 border-l-0 border-r-0 border-primary p-2'>
@@ -815,7 +810,8 @@ const Invoice = () => {
 
                                             <Field
                                                 className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                                    errors.quantity
+                                                    errors.quantity &&
+                                                    touched.quantity
                                                         ? ' border-red-500 focus:ring-red-500'
                                                         : ''
                                                 } `}
@@ -981,6 +977,15 @@ const Invoice = () => {
                                                                 ]
                                                             }
                                                         )
+
+                                                        const total =
+                                                            values.amount +
+                                                            values.credit_used
+                                                        setFieldValue(
+                                                            'credit_used',
+                                                            total
+                                                        )
+
                                                         setFieldValue(
                                                             'description',
                                                             ''
@@ -1000,6 +1005,10 @@ const Invoice = () => {
                                                         setFieldValue(
                                                             'amount',
                                                             0
+                                                        )
+
+                                                        console.log(
+                                                            selectedItems
                                                         )
                                                     } else {
                                                         console.log('duplicate')
@@ -1026,20 +1035,69 @@ const Invoice = () => {
                                             quantity={values.quantity}
                                             unitPrice={unitPrice}
                                             amount={values.amount}
+                                            credit_used={values.credit_used}
+                                            setTotalAmount={setTotalAmount}
+                                            setTotalSalesVat={setTotalSalesVat}
+                                            setVat={setVat}
                                         />
                                     ) : (
                                         <div className='mx-auto my-2 flex w-full items-center justify-center'>
                                             <span className='loading loading-spinner loading-lg'></span>
                                         </div>
                                     )}
+                                    {console.log(values.items)}
 
-                                    <div className='flex flex-col gap-5 bg-neutral py-2'>
-                                        <p className='mx-2 text-right font-bold '>
-                                            Credit Limit : {values.credit_limit}
-                                        </p>
-                                        <p className='mx-2 text-right font-bold '>
-                                            Total Amount : {totalAmount}
-                                        </p>
+                                    <div className='w-full  bg-base-100 px-2 py-2'>
+                                        <div className='flex flex-col gap-4'>
+                                            <div className='flex justify-end '>
+                                                <p
+                                                    className='tooltip tooltip-right font-bold before:text-xs'
+                                                    data-tip={`Remaining: ${
+                                                        values.credit_limit -
+                                                        values.credit_used
+                                                    }`}
+                                                >
+                                                    Credit Limit:{' '}
+                                                    {totalSalesVat.toFixed(2)}/{' '}
+                                                    {values.credit_limit
+                                                        ? values.credit_limit.toFixed(
+                                                              2
+                                                          )
+                                                        : 0}
+                                                </p>
+                                            </div>
+                                            <div className='flex  justify-end'>
+                                                <p className='font-bold'>
+                                                    {`TOTAL SALES (VAT inclusive): ${totalSalesVat.toFixed(
+                                                        2
+                                                    )}`}
+                                                </p>
+                                            </div>
+                                            <div className='flex  justify-between'>
+                                                <p className='font-bold '>
+                                                    VATable Sales:
+                                                    {totalAmount.toFixed(2)}
+                                                </p>
+                                                <p className='font-bold'>
+                                                    Less: VAT: {vat.toFixed(2)}{' '}
+                                                </p>
+                                            </div>
+                                            <div className='flex  justify-end'>
+                                                <p className='font-bold'>
+                                                    Amount: NET of VAT{' '}
+                                                    {totalAmount.toFixed(2)}{' '}
+                                                </p>
+                                            </div>
+                                            <div className='flex justify-between'>
+                                                <p className='font-bold'>
+                                                    VAT 12%: {vat.toFixed(2)}{' '}
+                                                </p>
+                                                <p className='font-bold '>
+                                                    Total Amount Due:{' '}
+                                                    {totalSalesVat.toFixed(2)}
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

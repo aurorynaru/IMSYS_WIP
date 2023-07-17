@@ -26,7 +26,10 @@ const Table = (props) => {
         description,
         quantity,
         unitPrice,
-        amount
+        credit_used,
+        setTotalAmount,
+        setTotalSalesVat,
+        setVat
     } = props
 
     const deleteItem = (index) => {
@@ -34,6 +37,10 @@ const Table = (props) => {
             const newArr = prev.filter((elem, arrIndex) => {
                 if (index != arrIndex) {
                     return elem
+                } else {
+                    const credit = credit_used - elem.amount
+                    setFieldValue('credit_used', credit)
+                    setTotalAmount(prev => prev - elem.amount)
                 }
             })
 
@@ -122,7 +129,7 @@ const Table = (props) => {
     }, [headerArray, bodyArray])
 
     useEffect(() => {
-        if (bodyArray.length > 0) {
+        if (bodyArray.length >= 0) {
             const updatedBodyData = bodyArray.map((body, index) => {
                 const { description, quantity, unit, unitPrice, amount } = body
 
