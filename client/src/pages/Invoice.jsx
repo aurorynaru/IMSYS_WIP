@@ -18,7 +18,7 @@ import { tailwindError } from '../tailwindcss'
 import Table from '../components/Table'
 const currentDate = new Date()
 
-const Invoice = () => {
+const Invoice = ({ user }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const headerArray = ['Quantity', 'Brand', 'Description', 'Price']
@@ -27,6 +27,10 @@ const Invoice = () => {
     const [totalAmount, setTotalAmount] = useState(0)
     const [totalSalesVat, setTotalSalesVat] = useState(0)
     const [vat, setVat] = useState(0)
+    const [isClientSelected, setIsClientSelected] = useState(false)
+    const [status, setStatus] = useState('Invoice Status')
+    const [creditLimit, setCreditLimit] = useState(0)
+    const [creditUsed, setCreditUsed] = useState(0)
 
     //supplier
     const [isLoadingClient, setIsLoadingClient] = useState(false)
@@ -39,6 +43,7 @@ const Invoice = () => {
     const [description, setDescription] = useState('')
     const [unitPrice, setUnitPrice] = useState(0)
     const [amount, setAmount] = useState(0)
+    const [itemId, setItemId] = useState(null)
     const [selectedItems, setSelectedItems] = useState([])
 
     //pagination
@@ -60,8 +65,6 @@ const Invoice = () => {
 
     const initialValues = {
         invoice_number: '',
-        credit_limit: 0,
-        credit_used: 0,
         client: '',
         address: '',
         items: [],
@@ -70,96 +73,60 @@ const Invoice = () => {
         tin: '',
         terms: '',
         recipient: '',
-        vatable_sales: '',
-        vat: '',
-        total_sales_vat_inclusive: '',
-        less_vat: '',
-        net_vat: '',
-        total_amount_due: '',
-        user_id: '',
-        status: '',
-        itemsObject: {},
-        quantity: 0,
-        unit: '',
-        description: '',
-        unitPrice: 0,
-        amount: 0,
-        TotalAmount: 0
+        clientId: ''
     }
 
     const Schema = yup.object().shape({
-        invoice_number: yup.number().min(4).required('required'),
-        credit_limit: yup.string().required('Credit limit is required'),
+        invoice_number: yup
+            .string()
+            .min(4, ' must be atleast 4 numbers')
+            .required('required'),
         client: yup.string().min(3).max(100).required('required'),
         address: yup.string().required('required'),
         date_created: yup.date().required('required'),
         due_date: yup.date().required('required'),
         terms: yup.number(),
         recipient: yup.string().required('required'),
-        vatable_sales: yup.number().positive('Must be greater than 0'),
         tin: yup
             .string()
             .min(15, 'Tin number must be at least 12 numbers.')
             .max(15, 'Tin number must be at max 12 numbers.')
-            .required('Tin number is required'),
-        vat: yup
-            .number()
-            .min(7)
-            .positive('Must be greater than 0')
-            .required('required'),
-        total_sales_vat_inclusive: yup
-            .number()
-            .min(2)
-            .positive('Must be greater than 0')
-            .required('required'),
-        less_vat: yup
-            .number()
-            .min(2)
-            .positive('Must be greater than 0')
-            .required('required'),
-        net_vat: yup
-            .number()
-            .min(2)
-            .positive('Must be greater than 0')
-            .required('required'),
-        total_amount_due: yup
-            .number()
-            .min(2)
-            .positive('Must be greater than 0')
-            .required('required'),
-        itemsObject: yup.object().required('required'),
-        quantity: yup
-            .number()
-            .min(1)
-            .test('lessThan', 'Insufficient supply', function (value) {
-                return value <= totalQuantity
-            })
-            .positive('Must be greater than 0')
-            .required('required'),
-        unit: yup.string().required('required'),
-        description: yup.string().required('required'),
-        unitPrice: yup
-            .number()
-            .min(1)
-            .positive('Must be greater than 0')
-            .required('required'),
-        amount: yup
-            .number()
-            .min(1)
-            .positive('Must be greater than 0')
-            .required('required'),
-        totalAmount: yup
-            .number()
-            .min(1)
-            .positive('Must be greater than 0')
-            .required('required'),
-        credit_used: yup.number().required('required'),
-        user_id: '',
-        status: ''
+            .required('Tin number is required')
     })
 
-    const handleSubmit = (values) => {
+    const handleSubmit = async (values) => {
+        const itemsOjb = {}
+
+        itemsOjb.vatableSales = totalAmount.toFixed(2)
+        itemsOjb.TotalAmountDue = totalSalesVat.toFixed(2)
+        itemsOjb.vat = vat.toFixed(2)
+
+        values.user_id = user.id
+
+        values.items.push(itemsOjb)
         console.log(values)
+        const savedUserResponse = await fetch(
+            'http://localhost:8888/register/product',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(values)
+            }
+        )
+
+        const savedProduct = await savedUserResponse.json()
+        if (savedProduct.error) {
+            setResError(savedProduct.error)
+        }
+
+        if (savedProduct) {
+            if (!savedProduct.error) {
+                navigate('/register/product')
+                onSubmitProps.resetForm()
+            }
+        }
     }
 
     const handleSearchClient = async (query) => {
@@ -174,7 +141,7 @@ const Invoice = () => {
                 )
 
                 const newSearch = await response.json()
-
+                console.log(newSearch)
                 setSearchResultClient(newSearch)
                 setIsLoadingClient(false)
             }
@@ -284,6 +251,30 @@ const Invoice = () => {
     }, [totalAmount])
 
     useEffect(() => {
+        if (
+            quantity != '' ||
+            amount != '' ||
+            description != '' ||
+            unit != '' ||
+            (unitPrice != '' && isClientSelected === true)
+        ) {
+            setErrorItem(false)
+        }
+
+        if (totalQuantity > quantity) {
+            setErrorItem(false)
+        }
+    }, [description, quantity, unit, unitPrice, amount])
+
+    useEffect(() => {
+        if (totalSalesVat > 0) {
+            if (totalSalesVat > creditLimit) {
+                setStatus('Pending Override')
+            }
+        }
+    }, [totalSalesVat])
+
+    useEffect(() => {
         handleSearchProduct()
     }, [
         min,
@@ -374,201 +365,287 @@ const Invoice = () => {
                             onSubmit={handleSubmit}
                             className='mx-5 my-5 flex w-1/2 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-3 shadow-lg'
                         >
-                            <div className='flex flex-col gap-3 px-2 '>
+                            <div className='flex flex-col gap-3 px-2'>
                                 <h1 className='text-lg font-medium '>
                                     Create Invoice
                                 </h1>
-                                <div className='flex flex-col gap-1'>
+                                <div className='flex w-full items-center gap-5 '>
+                                    <div className='flex w-1/2 flex-col gap-1 '>
+                                        <label
+                                            className='flex items-center text-left text-sm font-semibold text-neutral'
+                                            htmlFor='client'
+                                        >
+                                            Client Name
+                                            <span
+                                                className='tooltip tooltip-right ml-1 before:text-xs'
+                                                data-tip='client name'
+                                            >
+                                                <ExclamationCircleIcon className='h-5 w-5 text-neutral' />
+                                            </span>
+                                        </label>
+
+                                        <input
+                                            className={` input-primary input input-sm rounded-sm text-primary ${
+                                                errors.client && touched.client
+                                                    ? ` border-red-500 focus:ring-red-500`
+                                                    : ''
+                                            }`}
+                                            value={values.client}
+                                            onChange={(event) => {
+                                                const value = event.target.value
+                                                debounceSubmitClient(value)
+                                                setFieldValue('client', value)
+                                            }}
+                                            onBlur={handleBlur}
+                                            id='client'
+                                            placeholder='Enter client name'
+                                        ></input>
+                                        {searchResultClient.length > 0 ? (
+                                            <div className='min-w-1/2 max-w-3/4 z-40 flex h-fit  max-h-[180px] w-3/4 flex-col items-center overflow-auto  rounded-md border-2  border-gray-600 bg-base-300 p-2'>
+                                                {searchResultClient.map(
+                                                    (elem) => {
+                                                        if (elem) {
+                                                            return (
+                                                                <div
+                                                                    onMouseEnter={(
+                                                                        event
+                                                                    ) => {
+                                                                        const text =
+                                                                            event
+                                                                                .target
+                                                                                .innerText
+                                                                        const startDateObject =
+                                                                            new Date(
+                                                                                values.date_created
+                                                                            )
+                                                                        startDateObject.setDate(
+                                                                            startDateObject.getDate() +
+                                                                                elem.terms
+                                                                        )
+
+                                                                        const formattedDate =
+                                                                            startDateObject
+                                                                                .toISOString()
+                                                                                .split(
+                                                                                    'T'
+                                                                                )[0]
+
+                                                                        setFieldValue(
+                                                                            'client',
+                                                                            text
+                                                                        )
+                                                                        setFieldValue(
+                                                                            'tin',
+                                                                            elem.tin
+                                                                        )
+                                                                        setFieldValue(
+                                                                            'terms',
+                                                                            elem.terms
+                                                                        )
+
+                                                                        setCreditLimit(
+                                                                            elem.credit_limit
+                                                                        )
+
+                                                                        setFieldValue(
+                                                                            'address',
+                                                                            elem.address
+                                                                        )
+
+                                                                        setFieldValue(
+                                                                            'due_date',
+                                                                            formattedDate
+                                                                        )
+
+                                                                        setCreditUsed(
+                                                                            elem.credit_used
+                                                                        )
+                                                                    }}
+                                                                    onMouseLeave={() => {
+                                                                        setFieldValue(
+                                                                            'client',
+                                                                            ''
+                                                                        )
+                                                                        setFieldValue(
+                                                                            'tin',
+                                                                            ''
+                                                                        )
+                                                                        setFieldValue(
+                                                                            'terms',
+                                                                            ''
+                                                                        )
+                                                                        setCreditLimit(
+                                                                            0
+                                                                        )
+
+                                                                        setFieldValue(
+                                                                            'address',
+                                                                            ''
+                                                                        )
+                                                                        setFieldValue(
+                                                                            'due_date',
+                                                                            ''
+                                                                        )
+                                                                        setCreditUsed(
+                                                                            0.0
+                                                                        )
+                                                                    }}
+                                                                    onClick={(
+                                                                        event
+                                                                    ) => {
+                                                                        const text =
+                                                                            event
+                                                                                .target
+                                                                                .innerText
+
+                                                                        const startDateObject =
+                                                                            new Date(
+                                                                                values.date_created
+                                                                            )
+                                                                        startDateObject.setDate(
+                                                                            startDateObject.getDate() +
+                                                                                elem.terms
+                                                                        )
+
+                                                                        const formattedDate =
+                                                                            startDateObject
+                                                                                .toISOString()
+                                                                                .split(
+                                                                                    'T'
+                                                                                )[0]
+
+                                                                        setSearchResultClient(
+                                                                            []
+                                                                        )
+                                                                        setFieldValue(
+                                                                            'client',
+                                                                            text
+                                                                        )
+                                                                        setFieldValue(
+                                                                            'tin',
+                                                                            elem.tin
+                                                                        )
+                                                                        setFieldValue(
+                                                                            'terms',
+                                                                            elem.terms
+                                                                        )
+                                                                        setCreditLimit(
+                                                                            elem.credit_limit
+                                                                        )
+
+                                                                        setFieldValue(
+                                                                            'address',
+                                                                            elem.address
+                                                                        )
+
+                                                                        setFieldValue(
+                                                                            'due_date',
+                                                                            formattedDate
+                                                                        )
+
+                                                                        setFieldValue(
+                                                                            'clientId',
+                                                                            elem.id
+                                                                        )
+
+                                                                        setCreditUsed(
+                                                                            elem.credit_used
+                                                                        )
+
+                                                                        setIsClientSelected(
+                                                                            true
+                                                                        )
+                                                                    }}
+                                                                    className=' flex h-fit w-full cursor-pointer  items-center  justify-between rounded-md p-1 text-sm font-medium text-primary hover:bg-neutral hover:text-accent'
+                                                                    key={
+                                                                        elem.id
+                                                                    }
+                                                                >
+                                                                    <p>
+                                                                        {
+                                                                            elem.name
+                                                                        }
+                                                                    </p>
+                                                                </div>
+                                                            )
+                                                        }
+                                                    }
+                                                )}
+                                            </div>
+                                        ) : isLoadingClient ? (
+                                            <div className=' w-[50px]] flex h-[180px] max-h-[50px] flex-col  items-center justify-center   overflow-auto  rounded-md border-2  border-gray-600 bg-base-300'>
+                                                <span className='loading loading-spinner loading-md text-neutral '></span>
+                                            </div>
+                                        ) : (
+                                            ''
+                                        )}
+                                        {errorText(
+                                            errors.client,
+                                            touched.client
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='flex w-full items-center gap-5 px-2'>
+                                <div className='flex w-1/2 flex-col'>
                                     <label
                                         className='flex items-center text-left text-sm font-semibold text-neutral'
                                         htmlFor='client'
                                     >
-                                        Client Name
-                                        <span
-                                            className='tooltip tooltip-right ml-1 before:text-xs'
-                                            data-tip='client name'
-                                        >
-                                            <ExclamationCircleIcon className='h-5 w-5 text-neutral' />
-                                        </span>
+                                        Invoice Number
+                                        <span className=' ml-1 '></span>
                                     </label>
 
-                                    <input
+                                    <Field
                                         className={` input-primary input input-sm rounded-sm text-primary ${
-                                            errors.client && touched.client
+                                            errors.invoice_number &&
+                                            touched.invoice_number
                                                 ? ` border-red-500 focus:ring-red-500`
                                                 : ''
                                         }`}
-                                        value={values.client}
-                                        onChange={(event) => {
-                                            const value = event.target.value
-                                            debounceSubmitClient(value)
-                                            setFieldValue('client', value)
-                                        }}
+                                        type='number'
+                                        name='invoice_number'
+                                        value={values.invoice_number}
+                                        onChange={handleChange}
                                         onBlur={handleBlur}
-                                        id='client'
-                                        placeholder='Enter client name'
-                                    ></input>
-                                    {searchResultClient.length > 0 ? (
-                                        <div className=' min-w-3/3 flex h-fit max-h-[180px]  w-2/3 flex-col items-center overflow-auto rounded-md  border-2 border-gray-600  bg-base-300 p-2'>
-                                            {searchResultClient.map((elem) => {
-                                                if (elem) {
-                                                    return (
-                                                        <div
-                                                            onMouseEnter={(
-                                                                event
-                                                            ) => {
-                                                                const text =
-                                                                    event.target
-                                                                        .innerText
-                                                                const startDateObject =
-                                                                    new Date(
-                                                                        values.date_created
-                                                                    )
-                                                                startDateObject.setDate(
-                                                                    startDateObject.getDate() +
-                                                                        elem.terms
-                                                                )
+                                        id='invoice_number'
+                                        placeholder='Enter invoice number '
+                                    ></Field>
 
-                                                                const formattedDate =
-                                                                    startDateObject
-                                                                        .toISOString()
-                                                                        .split(
-                                                                            'T'
-                                                                        )[0]
-
-                                                                setFieldValue(
-                                                                    'client',
-                                                                    text
-                                                                )
-                                                                setFieldValue(
-                                                                    'tin',
-                                                                    elem.tin
-                                                                )
-                                                                setFieldValue(
-                                                                    'terms',
-                                                                    elem.terms
-                                                                )
-                                                                setFieldValue(
-                                                                    'credit_limit',
-                                                                    elem.credit_limit
-                                                                )
-                                                                setFieldValue(
-                                                                    'address',
-                                                                    elem.address
-                                                                )
-
-                                                                setFieldValue(
-                                                                    'due_date',
-                                                                    formattedDate
-                                                                )
-                                                                setFieldValue(
-                                                                    'credit_used',
-                                                                    elem.credit_used
-                                                                )
-                                                            }}
-                                                            onMouseLeave={() => {
-                                                                setFieldValue(
-                                                                    'client',
-                                                                    ''
-                                                                )
-                                                                setFieldValue(
-                                                                    'tin',
-                                                                    ''
-                                                                )
-                                                                setFieldValue(
-                                                                    'terms',
-                                                                    ''
-                                                                )
-                                                                setFieldValue(
-                                                                    'credit_limit',
-                                                                    ''
-                                                                )
-                                                                setFieldValue(
-                                                                    'address',
-                                                                    ''
-                                                                )
-                                                                setFieldValue(
-                                                                    'due_date',
-                                                                    ''
-                                                                )
-                                                                setFieldValue(
-                                                                    'credit_used',
-                                                                    ' '
-                                                                )
-                                                            }}
-                                                            onClick={(
-                                                                event
-                                                            ) => {
-                                                                const text =
-                                                                    event.target
-                                                                        .innerText
-
-                                                                const startDateObject =
-                                                                    new Date(
-                                                                        values.date_created
-                                                                    )
-                                                                startDateObject.setDate(
-                                                                    startDateObject.getDate() +
-                                                                        elem.terms
-                                                                )
-
-                                                                const formattedDate =
-                                                                    startDateObject
-                                                                        .toISOString()
-                                                                        .split(
-                                                                            'T'
-                                                                        )[0]
-
-                                                                setSearchResultClient(
-                                                                    []
-                                                                )
-                                                                setFieldValue(
-                                                                    'client',
-                                                                    text
-                                                                )
-                                                                setFieldValue(
-                                                                    'tin',
-                                                                    elem.tin
-                                                                )
-                                                                setFieldValue(
-                                                                    'terms',
-                                                                    elem.terms
-                                                                )
-                                                                setFieldValue(
-                                                                    'credit_limit',
-                                                                    elem.credit_limit
-                                                                )
-                                                                setFieldValue(
-                                                                    'address',
-                                                                    elem.address
-                                                                )
-
-                                                                setFieldValue(
-                                                                    'due_date',
-                                                                    formattedDate
-                                                                )
-                                                                setFieldValue(
-                                                                    'credit_used',
-                                                                    elem.credit_used
-                                                                )
-                                                            }}
-                                                            className=' flex h-fit w-full cursor-pointer  items-center  justify-between rounded-md p-1 text-sm font-medium text-primary hover:bg-neutral hover:text-accent'
-                                                            key={elem.id}
-                                                        >
-                                                            <p>{elem.name}</p>
-                                                        </div>
-                                                    )
-                                                }
-                                            })}
-                                        </div>
-                                    ) : isLoadingClient ? (
-                                        <div className=' w-[50px]] flex h-[180px] max-h-[50px] flex-col  items-center justify-center   overflow-auto  rounded-md border-2  border-gray-600 bg-base-300'>
-                                            <span className='loading loading-spinner loading-md text-neutral '></span>
-                                        </div>
-                                    ) : (
-                                        ''
+                                    {errorText(
+                                        errors.invoice_number,
+                                        touched.invoice_number
                                     )}
-                                    {errorText(errors.client, touched.client)}
+                                </div>
+                                <div className='flex w-1/2 flex-col'>
+                                    <label
+                                        className='flex items-center text-left text-sm font-semibold text-neutral'
+                                        htmlFor='recipient'
+                                    >
+                                        Recipient Name
+                                        <span className=' ml-1 '></span>
+                                    </label>
+
+                                    <Field
+                                        className={` input-primary input input-sm rounded-sm text-primary ${
+                                            errors.recipient &&
+                                            touched.recipient
+                                                ? ` border-red-500 focus:ring-red-500`
+                                                : ''
+                                        }`}
+                                        type='string'
+                                        name='recipient'
+                                        value={values.recipient}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        id='recipient'
+                                        placeholder='Enter Recipient Name'
+                                    ></Field>
+
+                                    {errorText(
+                                        errors.recipient,
+                                        touched.recipient
+                                    )}
                                 </div>
                             </div>
 
@@ -759,6 +836,12 @@ const Invoice = () => {
                                         sortQuantityFunction={
                                             setSortPageQuantity
                                         }
+                                        setItemId={setItemId}
+                                        setUnit={setUnit}
+                                        setDescription={setDescription}
+                                        setQuantity={setQuantity}
+                                        setUnitPrice={setUnitPrice}
+                                        setAmount={setAmount}
                                         sortDescFunction={setSortPageDesc}
                                         sortBrandFunction={setSortPageBrandName}
                                         brandNameSearch={brandNameSearch}
@@ -768,10 +851,9 @@ const Invoice = () => {
                                         setFieldValue={setFieldValue}
                                         setTotalQuantity={setTotalQuantity}
                                         headerArray={headerArray}
-                                        credit_used={values.credit_used}
                                     />
                                 </div>
-                                <div className='border-2 border-l-0 border-r-0 border-primary p-2'>
+                                <div className='flex flex-col gap-3 border-2 border-l-0 border-r-0 border-primary p-2'>
                                     <div className='flex'>
                                         <div className='w-full'>
                                             <label
@@ -780,23 +862,22 @@ const Invoice = () => {
                                             >
                                                 Description
                                             </label>
-                                            <Field
-                                                className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                                    errors.description &&
-                                                    touched.description
-                                                        ? ' border-red-500 focus:ring-red-500'
-                                                        : ''
-                                                } `}
+                                            <input
+                                                className={`input-primary input input-sm w-full rounded-sm text-primary`}
                                                 name='description'
                                                 type='text'
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                value={values.description}
+                                                disabled={
+                                                    isClientSelected
+                                                        ? false
+                                                        : true
+                                                }
+                                                onChange={(event) => {
+                                                    const value =
+                                                        event.target.value
+                                                    setDescription(value)
+                                                }}
+                                                value={description}
                                             />
-                                            {errorText(
-                                                errors.description,
-                                                touched.description
-                                            )}
                                         </div>
                                     </div>
                                     <div className='flex w-full items-center gap-5 '>
@@ -808,40 +889,26 @@ const Invoice = () => {
                                                 Quantity
                                             </label>
 
-                                            <Field
-                                                className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                                    errors.quantity &&
-                                                    touched.quantity
-                                                        ? ' border-red-500 focus:ring-red-500'
-                                                        : ''
-                                                } `}
+                                            <input
+                                                className={`input-primary input input-sm w-full rounded-sm text-primary`}
                                                 name='quantity'
                                                 type='number'
+                                                disabled={
+                                                    isClientSelected
+                                                        ? false
+                                                        : true
+                                                }
                                                 onChange={(event) => {
                                                     const value =
                                                         event.target.value
-                                                    const price =
-                                                        values.unitPrice
-
                                                     const totalAmt =
-                                                        value * price
-                                                    setFieldValue(
-                                                        'amount',
-                                                        totalAmt
-                                                    )
-                                                    setFieldValue(
-                                                        'quantity',
-                                                        value
-                                                    )
-                                                }}
-                                                onBlur={handleBlur}
-                                                value={values.quantity}
-                                            />
+                                                        value * unitPrice
 
-                                            {errorText(
-                                                errors.quantity,
-                                                touched.quantity
-                                            )}
+                                                    setAmount(totalAmt)
+                                                    setQuantity(value)
+                                                }}
+                                                value={quantity}
+                                            />
                                         </div>
                                         <div className='flex  flex-col'>
                                             <label
@@ -850,22 +917,22 @@ const Invoice = () => {
                                             >
                                                 Unit
                                             </label>
-                                            <Field
-                                                className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                                    errors.unit && touched.unit
-                                                        ? ' border-red-500 focus:ring-red-500'
-                                                        : ''
-                                                } `}
+                                            <input
+                                                className={`input-primary input input-sm w-full rounded-sm text-primary`}
                                                 name='unit'
+                                                disabled={
+                                                    isClientSelected
+                                                        ? false
+                                                        : true
+                                                }
                                                 type='text'
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                value={values.unit}
+                                                onChange={(event) => {
+                                                    const value =
+                                                        event.target.value
+                                                    setUnit(value)
+                                                }}
+                                                value={unit}
                                             />
-                                            {errorText(
-                                                errors.unit,
-                                                touched.unit
-                                            )}
                                         </div>
 
                                         <div className='flex  flex-col'>
@@ -875,23 +942,22 @@ const Invoice = () => {
                                             >
                                                 Unit Price
                                             </label>
-                                            <Field
-                                                className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                                    errors.unitPrice &&
-                                                    touched.unitPrice
-                                                        ? ' border-red-500 focus:ring-red-500'
-                                                        : ''
-                                                } `}
+                                            <input
+                                                className={`input-primary input input-sm w-full rounded-sm text-primary`}
                                                 name='unitPrice'
+                                                disabled={
+                                                    isClientSelected
+                                                        ? false
+                                                        : true
+                                                }
                                                 type='text'
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                value={values.unitPrice}
+                                                onChange={(event) => {
+                                                    const value =
+                                                        event.target.value
+                                                    setUnitPrice(value)
+                                                }}
+                                                value={unitPrice}
                                             />
-                                            {errorText(
-                                                errors.unitPrice,
-                                                touched.unitPrice
-                                            )}
                                         </div>
                                     </div>
 
@@ -902,114 +968,116 @@ const Invoice = () => {
                                         >
                                             Amount
                                         </label>
-                                        <Field
-                                            className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                                errors.amount && touched.amount
-                                                    ? ' border-red-500 focus:ring-red-500'
-                                                    : ''
-                                            } `}
+                                        <input
+                                            className={`input-primary input input-sm w-full rounded-sm text-primary`}
                                             name='amount'
+                                            disabled={
+                                                isClientSelected ? false : true
+                                            }
                                             type='text'
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            value={values.amount}
+                                            onChange={(event) => {
+                                                const value = event.target.value
+                                                setAmount(value)
+                                            }}
+                                            value={amount}
                                         />
-                                        {errorText(
-                                            errors.amount,
-                                            touched.amount
-                                        )}
                                     </div>
                                     {errorItem && (
                                         <p
-                                            className={` ${tailwindError} my-2 text-center`}
+                                            className={` ${tailwindError} my-2 text-center font-bold`}
                                         >
-                                            Incomplete values / Invalid values
+                                            {errorItem &&
+                                            totalQuantity < quantity
+                                                ? 'quantity is greater that available item stock '
+                                                : 'Incomplete values / Invalid values'}
                                         </p>
                                     )}
-                                    <div className='flex w-full items-center justify-center'>
+                                    <div
+                                        className={`flex w-full items-center justify-center ${
+                                            isClientSelected
+                                                ? 'cursor-default'
+                                                : 'cursor-not-allowed'
+                                        }`}
+                                    >
                                         <button
                                             type='button'
+                                            disabled={
+                                                isClientSelected ? false : true
+                                            }
                                             onClick={() => {
                                                 const obj = {}
                                                 if (
-                                                    errors.quantity ||
-                                                    errors.amount ||
-                                                    errors.description ||
-                                                    errors.unit ||
-                                                    errors.unitPrice
+                                                    quantity === '' ||
+                                                    amount === '' ||
+                                                    description === '' ||
+                                                    unit === '' ||
+                                                    unitPrice === ''
                                                 ) {
                                                     setErrorItem(true)
                                                     return
                                                 }
+
+                                                if (totalQuantity < quantity) {
+                                                    setErrorItem(true)
+                                                    return
+                                                }
                                                 if (
-                                                    values.description &&
-                                                    values.unitPrice &&
-                                                    values.quantity &&
-                                                    values.unit &&
-                                                    values.amount
+                                                    description &&
+                                                    unitPrice &&
+                                                    quantity &&
+                                                    unit &&
+                                                    amount
                                                 ) {
                                                     const isMatch =
                                                         selectedItems.find(
                                                             (item) =>
                                                                 item.description ===
-                                                                values.description
+                                                                description
                                                         )
                                                     if (!isMatch) {
                                                         obj.description =
-                                                            values.description
+                                                            description
                                                         obj.unitPrice =
-                                                            values.unitPrice
-                                                        obj.quantity =
-                                                            values.quantity
-                                                        obj.unit = values.unit
-                                                        obj.amount =
-                                                            values.amount
+                                                            unitPrice
+                                                        obj.quantity = quantity
+                                                        obj.unit = unit
+                                                        obj.amount = amount
+                                                        obj.id = itemId
                                                         setErrorItem(false)
                                                         setSelectedItems(
                                                             (prev) => {
                                                                 const arr = [
                                                                     obj
                                                                 ]
+                                                                const ItemsArray =
+                                                                    [
+                                                                        ...prev,
+                                                                        ...arr
+                                                                    ]
 
-                                                                return [
-                                                                    ...prev,
-                                                                    ...arr
-                                                                ]
+                                                                setFieldValue(
+                                                                    'items',
+                                                                    [
+                                                                        ...prev,
+                                                                        ...arr
+                                                                    ]
+                                                                )
+
+                                                                return ItemsArray
                                                             }
                                                         )
 
                                                         const total =
-                                                            values.amount +
-                                                            values.credit_used
-                                                        setFieldValue(
-                                                            'credit_used',
-                                                            total
-                                                        )
+                                                            amount + creditUsed
 
-                                                        setFieldValue(
-                                                            'description',
-                                                            ''
-                                                        )
-                                                        setFieldValue(
-                                                            'unit',
-                                                            ' '
-                                                        )
-                                                        setFieldValue(
-                                                            'quantity',
-                                                            0
-                                                        )
-                                                        setFieldValue(
-                                                            'unitPrice',
-                                                            0
-                                                        )
-                                                        setFieldValue(
-                                                            'amount',
-                                                            0
-                                                        )
-
-                                                        console.log(
-                                                            selectedItems
-                                                        )
+                                                        setCreditUsed(total)
+                                                        setItemId('')
+                                                        setUnit('')
+                                                        setDescription('')
+                                                        setQuantity(0)
+                                                        setUnitPrice(0)
+                                                        setAmount(0)
+                                                        setTotalQuantity(0)
                                                     } else {
                                                         console.log('duplicate')
                                                     }
@@ -1019,10 +1087,11 @@ const Invoice = () => {
                                             }}
                                             className='btn-neutral btn-active btn-wide btn-sm btn hover:text-secondary'
                                         >
-                                            Add Item
+                                            Add new item
                                         </button>
                                     </div>
                                 </div>
+
                                 <div className=''>
                                     {itemsObject ? (
                                         <Table
@@ -1030,12 +1099,13 @@ const Invoice = () => {
                                             setSelectedItems={setSelectedItems}
                                             selectedItems={selectedItems}
                                             setFieldValue={setFieldValue}
-                                            unit={values.unit}
-                                            description={values.description}
-                                            quantity={values.quantity}
-                                            unitPrice={unitPrice}
-                                            amount={values.amount}
-                                            credit_used={values.credit_used}
+                                            setUnit={setUnit}
+                                            setDescription={setDescription}
+                                            setQuantity={setQuantity}
+                                            setUnitPrice={setUnitPrice}
+                                            setAmount={setAmount}
+                                            creditUsed={creditUsed}
+                                            setCreditUsed={setCreditUsed}
                                             setTotalAmount={setTotalAmount}
                                             setTotalSalesVat={setTotalSalesVat}
                                             setVat={setVat}
@@ -1045,7 +1115,6 @@ const Invoice = () => {
                                             <span className='loading loading-spinner loading-lg'></span>
                                         </div>
                                     )}
-                                    {console.log(values.items)}
 
                                     <div className='w-full  bg-base-100 px-2 py-2'>
                                         <div className='flex flex-col gap-4'>
@@ -1053,19 +1122,18 @@ const Invoice = () => {
                                                 <p
                                                     className='tooltip tooltip-right font-bold before:text-xs'
                                                     data-tip={`Remaining: ${
-                                                        values.credit_limit -
-                                                        values.credit_used
+                                                        creditLimit -
+                                                        creditUsed.toFixed(2)
                                                     }`}
                                                 >
                                                     Credit Limit:{' '}
-                                                    {totalSalesVat.toFixed(2)}/{' '}
-                                                    {values.credit_limit
-                                                        ? values.credit_limit.toFixed(
-                                                              2
-                                                          )
+                                                    {creditUsed.toFixed(2)}/{' '}
+                                                    {creditLimit
+                                                        ? creditLimit.toFixed(2)
                                                         : 0}
                                                 </p>
                                             </div>
+
                                             <div className='flex  justify-end'>
                                                 <p className='font-bold'>
                                                     {`TOTAL SALES (VAT inclusive): ${totalSalesVat.toFixed(
@@ -1076,7 +1144,9 @@ const Invoice = () => {
                                             <div className='flex  justify-between'>
                                                 <p className='font-bold '>
                                                     VATable Sales:
-                                                    {totalAmount.toFixed(2)}
+                                                    {` ${totalAmount.toFixed(
+                                                        2
+                                                    )}`}
                                                 </p>
                                                 <p className='font-bold'>
                                                     Less: VAT: {vat.toFixed(2)}{' '}
@@ -1100,16 +1170,60 @@ const Invoice = () => {
                                         </div>
                                     </div>
                                 </div>
+                                <div className='my-2 flex justify-end px-2'>
+                                    <div className='flex flex-col'>
+                                        <select
+                                            disabled={
+                                                totalSalesVat > creditLimit
+                                                    ? true
+                                                    : false
+                                            }
+                                            name='status'
+                                            value={status}
+                                            onChange={(event) => {
+                                                const value = event.target.value
+                                                setStatus(value)
+                                            }}
+                                            className='select-primary select select-sm rounded-sm'
+                                        >
+                                            <option disabled value=''>
+                                                Invoice Status...
+                                            </option>
+
+                                            <option>Pending</option>
+                                            <option>Pending Override</option>
+                                            <option>To follow</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
+                            <p
+                                className={`w-full text-center text-sm text-red-500 ${
+                                    totalSalesVat < 1500 &&
+                                    selectedItems.length > 0
+                                        ? ''
+                                        : 'invisible'
+                                }`}
+                            >
+                                {totalSalesVat < 1500 &&
+                                selectedItems.length > 0
+                                    ? 'Total amount must be 1500 or greater'
+                                    : ' '}
+                            </p>
                             <p
                                 className={`w-full text-center text-sm text-red-500 ${
                                     resError ? '' : 'invisible'
                                 }`}
                             >
-                                {resError ? resError : 'error'}
+                                {resError ? resError : ' '}
                             </p>
+
                             <button
-                                className='btn2 relative overflow-hidden rounded-bl-md rounded-br-md border-opacity-50  py-4 font-semibold uppercase leading-none tracking-wider'
+                                className={`  ${
+                                    isClientSelected && selectedItems.length > 0
+                                        ? 'cursor-pointer opacity-100'
+                                        : 'cursor-not-allowed opacity-50'
+                                } btn2 relative overflow-hidden rounded-bl-md rounded-br-md border-opacity-50  py-4 font-semibold uppercase leading-none tracking-wider`}
                                 type='submit'
                             >
                                 <span className='absolute inset-0 bg-neutral '></span>

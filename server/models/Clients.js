@@ -26,7 +26,7 @@ const clientSchema = mongoose.Schema(
             required: true
         },
         address: {
-            type: String,
+            type: Array,
             required: true
         },
         invoice: [{ type: Schema.Types.ObjectId, ref: 'invoice', default: [] }],

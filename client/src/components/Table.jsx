@@ -21,15 +21,14 @@ const Table = (props) => {
 
     const {
         setSelectedItems,
-        setFieldValue,
-        unit,
-        description,
-        quantity,
-        unitPrice,
-        credit_used,
+        creditUsed,
+        setCreditUsed,
         setTotalAmount,
-        setTotalSalesVat,
-        setVat
+        setUnit,
+        setDescription,
+        setQuantity,
+        setUnitPrice,
+        setAmount
     } = props
 
     const deleteItem = (index) => {
@@ -38,9 +37,9 @@ const Table = (props) => {
                 if (index != arrIndex) {
                     return elem
                 } else {
-                    const credit = credit_used - elem.amount
-                    setFieldValue('credit_used', credit)
-                    setTotalAmount(prev => prev - elem.amount)
+                    const credit = creditUsed - elem.amount
+                    setCreditUsed(credit)
+                    setTotalAmount((prev) => prev - elem.amount)
                 }
             })
 
@@ -51,12 +50,11 @@ const Table = (props) => {
     const editItem = (index) => {
         const { amount, description, quantity, unit, unitPrice } = body[index]
 
-        setFieldValue('description', description)
-        setFieldValue('unit', unit)
-        setFieldValue('quantity', quantity)
-        setFieldValue('unitPrice', unitPrice)
-        setFieldValue('amount', amount)
-
+        setUnit(unit)
+        setDescription(description)
+        setQuantity(quantity)
+        setUnitPrice(unitPrice)
+        setAmount(amount)
         deleteItem(index)
     }
 
@@ -187,7 +185,7 @@ const Table = (props) => {
 
     return (
         <div>
-            <div className='sat bg-neutral p-2'>
+            <div className='bg-neutral p-2'>
                 <p className='font-bold text-primary'>Items table</p>
             </div>
             {bodyData.length > 0 ? (

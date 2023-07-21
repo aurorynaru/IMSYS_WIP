@@ -3,22 +3,17 @@ import mongoose, { Schema } from 'mongoose'
 const invoiceSchema = mongoose.Schema(
     {
         invoice_number: { type: Number, required: true },
-        client: [{ type: Schema.Types.ObjectId, ref: 'clients' }],
+        client: { type: Schema.Types.ObjectId, ref: 'clients' },
         address: {
             type: String,
             required: true
         },
-        items: [
-            {
-                type: Schema.Types.ObjectId,
-                required: true
-            }
-        ],
+        items: { type: Array, required: true },
         date_created: {
             type: Date,
             required: true
         },
-        due_Date: {
+        due_date: {
             type: Date,
             required: true
         },
@@ -31,30 +26,6 @@ const invoiceSchema = mongoose.Schema(
         },
         delivery_to: {
             type: String,
-            required: true
-        },
-        vatable_sales: {
-            type: Number,
-            required: true
-        },
-        vat: {
-            type: Number,
-            required: true
-        },
-        total_sales_vat_inclusive: {
-            type: Number,
-            required: true
-        },
-        less_vat: {
-            type: Number,
-            required: true
-        },
-        net_vat: {
-            type: Number,
-            required: true
-        },
-        total_amount_due: {
-            type: Number,
             required: true
         },
         user_id: {

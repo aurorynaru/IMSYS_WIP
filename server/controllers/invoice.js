@@ -7,21 +7,16 @@ export const createInvoice = async (req, res) => {
         const {
             date_created,
             invoice_number,
-            client_id,
-            address,
+            clientId,
             description,
             purchase_order,
             user_id,
-            recipient,
-            vat,
-            total_sales_vat_inclusive,
-            less_vat,
-            net_vat
+            recipient
         } = req.body
         const items = req.body
 
         const user = await User.findById({ _id: user_id })
-        const client = await Client.findById({ _id: client_id })
+        const client = await Client.findById({ _id: clientId })
         const { terms, tin, name } = client
 
         const newInvoice = new Invoice({

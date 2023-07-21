@@ -16,7 +16,7 @@ import SupplierRegister from './pages/SupplierRegister'
 
 function App() {
     const isAuth = Boolean(useSelector((state) => state.token))
-
+    const user = useSelector((state) => state.user)
     return (
         <div className='min-h-screen bg-base-100 transition duration-500 ease-in-out'>
             <BrowserRouter>
@@ -28,7 +28,10 @@ function App() {
                         path='/register/product'
                         element={<ProductRegister />}
                     />
-                    <Route path='/create/invoice' element={<Invoice />} />
+                    <Route
+                        path='/create/invoice'
+                        element={<Invoice user={user} />}
+                    />
                     <Route path='/register/user' element={<Registration />} />
                     <Route
                         path='/register/supplier'

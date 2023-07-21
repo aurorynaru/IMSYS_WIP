@@ -9,12 +9,17 @@ import Navbar from '../components/Navbar'
 import { useDispatch } from 'react-redux'
 import { generateCustomID } from '../functions/randomID'
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
+import { PlusCircleIcon } from '@heroicons/react/24/outline'
 import Alert from '../components/Alert'
+import { background } from '../functions/background'
+import { v4 as uuidv4 } from 'uuid'
 const ClientRegister = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [resError, setResError] = useState('')
     const [successAlert, setSuccessAlert] = useState(false)
+    const [multipleAddress, setMultipleAddress] = useState([])
+    const [isMultipleAddress, setIsMultipleAddress] = useState(false)
 
     const initialValues = {
         name: '',
@@ -234,13 +239,57 @@ const ClientRegister = () => {
                                 />
                                 {errorText(errors.tin, touched.tin)}
                             </div>
+
+                            <div className='border-[1px] border-neutral p-1'>
+                                {isMultipleAddress && multipleAddress.length > 0
+                                    ? multipleAddress.map((address, index) => {
+                                          return (
+                                              <p
+                                                  key={address.id}
+                                                  className={`${background(
+                                                      index
+                                                  )}  `}
+                                              >
+                                                  {address.address}
+                                              </p>
+                                          )
+                                      })
+                                    : null}
+                            </div>
                             <div className='flex flex-col gap-1 text-black'>
-                                <label
-                                    className='text-sm font-semibold text-neutral'
-                                    htmlFor='credit_limit'
-                                >
-                                    Client Address
-                                </label>
+                                <div className='flex items-center justify-between'>
+                                    <label
+                                        className='min-h-[24px] text-sm font-semibold text-neutral'
+                                        htmlFor='credit_limit'
+                                    >
+                                        Client Address
+                                    </label>
+
+                                    {isMultipleAddress && (
+                                        <button
+                                            onClick={() => {
+                                                setMultipleAddress((prev) => {
+                                                    const array = [
+                                                        {
+                                                            id: uuidv4(),
+                                                            address:
+                                                                values.address
+                                                        }
+                                                    ]
+
+                                                    return [...prev, ...array]
+                                                })
+                                                setFieldValue('address', '')
+                                            }}
+                                            type='button'
+                                        >
+                                            <span className='flex cursor-pointer items-center text-xs font-medium text-primary'>
+                                                Add address
+                                                <PlusCircleIcon className='h-6 w-6 text-neutral' />
+                                            </span>
+                                        </button>
+                                    )}
+                                </div>
 
                                 <textarea
                                     className={`input-primary input input-sm h-20 rounded-sm text-primary ${
@@ -254,7 +303,30 @@ const ClientRegister = () => {
                                     placeholder='Client Address'
                                     onBlur={handleBlur}
                                 ></textarea>
-                                {errorText(errors.address, touched.address)}
+                                {errors.address && touched.address
+                                    ? errorText(errors.address, touched.address)
+                                    : null}
+                                <div className='flex'>
+                                    <label className='label cursor-pointer'>
+                                        <span className='label-text'>
+                                            Client multiple address
+                                        </span>
+                                        <input
+                                            onChange={() => {
+                                                setIsMultipleAddress(
+                                                    (prev) => !prev
+                                                )
+                                            }}
+                                            type='checkbox'
+                                            checked={
+                                                isMultipleAddress
+                                                    ? 'checked'
+                                                    : ''
+                                            }
+                                            className='checkbox checkbox-sm mx-2'
+                                        />
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <p

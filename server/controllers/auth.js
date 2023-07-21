@@ -45,8 +45,23 @@ export const login = async (req, res) => {
         const token = jwt.sign({ id: username._id }, process.env.JWT_SECRET)
 
         delete user.password
-
-        res.status(200).json({ token, user })
+        let userData = {}
+        for (const key in user) {
+            if (
+                key === 'first_name' ||
+                key === 'last_name' ||
+                key === 'isAdmin' ||
+                key === 'createdAt' ||
+                key === 'id' ||
+                key === 'posted_invoice' ||
+                key === 'revised_invoice' ||
+                key === 'username' ||
+                key === 'avatar'
+            ) {
+                userData[key] = user[key]
+            }
+        }
+        res.status(200).json({ token, userData })
     } catch (error) {
         return res.status(409).json({ error: error.message })
     }

@@ -40,7 +40,7 @@ const Login = () => {
             onSubmitProps.resetForm()
             dispatch(
                 setLogin({
-                    user: loggedIn.user,
+                    user: loggedIn.userData,
                     token: loggedIn.token
                 })
             )

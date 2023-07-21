@@ -28,7 +28,13 @@ const Search = (props) => {
         setPage,
         setFieldValue,
         setTotalQuantity,
-        headerArray
+        headerArray,
+        setUnit,
+        setDescription,
+        setQuantity,
+        setUnitPrice,
+        setAmount,
+        setItemId
     } = props
 
     return (
@@ -118,8 +124,14 @@ const Search = (props) => {
                     sortDescFunction={sortDescFunction}
                     sortBrandFunction={sortBrandFunction}
                     searchFunction={searchFunction}
-                    setFieldValue={setFieldValue}
                     setTotalQuantity={setTotalQuantity}
+                    setUnit={setUnit}
+                    setDescription={setDescription}
+                    setQuantity={setQuantity}
+                    setUnitPrice={setUnitPrice}
+                    setAmount={setAmount}
+                    setItemId={setItemId}
+                    setFieldValue={setFieldValue}
                 />
             ) : (
                 <div className='mx-auto my-2 flex w-full items-center justify-center'>

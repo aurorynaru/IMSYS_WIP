@@ -5,14 +5,19 @@ const TableForm = (props) => {
     const header = props.header
     const body = props.body
     const {
-        sortPrice,
         sortPriceFunction,
         sortQuantityFunction,
         sortBrandFunction,
         sortDescFunction,
         searchFunction,
-        setFieldValue,
-        setTotalQuantity
+        setTotalQuantity,
+        setUnit,
+        setDescription,
+        setQuantity,
+        setUnitPrice,
+        setAmount,
+        setItemId,
+        setFieldValue
     } = props
     const [headerArray, setHeader] = useState([])
     const [bodyArray, setBodyArray] = useState([])
@@ -115,23 +120,25 @@ const TableForm = (props) => {
     useEffect(() => {
         if (bodyArray.length > 0) {
             const updatedBodyData = bodyArray.map((body, index) => {
-                const { description, quantity, price, brand } = body
+                const { description, quantity, price, brand, _id } = body
 
                 return (
                     <tr
                         onClick={() => {
                             if (selectedColumn != body._id) {
                                 setSelectedColumn(body._id)
-                                setFieldValue('description', description)
-                                setFieldValue('unitPrice', price)
-                                setFieldValue('quantity', 0)
-                                setFieldValue('unit', '')
-                                setFieldValue('amount', 0)
+
+                                setUnit('')
+                                setDescription(description)
+                                setQuantity(0)
+                                setUnitPrice(price)
+                                setAmount(0)
+                                setItemId(_id)
                                 setTotalQuantity(quantity)
                             } else {
                                 setSelectedColumn(null)
-                                setFieldValue('description', '')
-                                setFieldValue('unitPrice', 0)
+                                setDescription('')
+                                setUnitPrice(0)
                             }
                         }}
                         key={body._id}
@@ -176,9 +183,9 @@ const TableForm = (props) => {
                         ) : (
                             <tr className='bg-base-100 text-sm'>
                                 <th>1</th>
-                                <td>Cy Ganderton</td>
+                                <td>test tester test</td>
                                 <td className='overflow-auto'>
-                                    Quality Control Specialist
+                                    Quality Control test
                                 </td>
                                 <td>Blue</td>
                                 <td>0</td>
