@@ -239,23 +239,43 @@ const ClientRegister = () => {
                                 />
                                 {errorText(errors.tin, touched.tin)}
                             </div>
+                            <div
+                                className={` ${
+                                    isMultipleAddress &&
+                                    multipleAddress.length > 0
+                                        ? 'max-h-[300px] overflow-auto rounded-md border-[1px] border-neutral p-1 '
+                                        : ''
+                                }`}
+                            >
+                                {isMultipleAddress &&
+                                multipleAddress.length > 0 ? (
+                                    <div className='bg-neutral px-1'>
+                                        <label className='text-primary'>
+                                            Address List:
+                                        </label>
+                                    </div>
+                                ) : (
+                                    ''
+                                )}
 
-                            <div className='border-[1px] border-neutral p-1'>
                                 {isMultipleAddress && multipleAddress.length > 0
                                     ? multipleAddress.map((address, index) => {
                                           return (
                                               <p
                                                   key={address.id}
-                                                  className={`${background(
+                                                  className={` whitespace-nowrap px-1 py-1 text-sm ${background(
                                                       index
                                                   )}  `}
                                               >
-                                                  {address.address}
+                                                  {`${index + 1}. ${
+                                                      address.address
+                                                  }`}
                                               </p>
                                           )
                                       })
                                     : null}
                             </div>
+
                             <div className='flex flex-col gap-1 text-black'>
                                 <div className='flex items-center justify-between'>
                                     <label
@@ -268,18 +288,38 @@ const ClientRegister = () => {
                                     {isMultipleAddress && (
                                         <button
                                             onClick={() => {
-                                                setMultipleAddress((prev) => {
-                                                    const array = [
-                                                        {
-                                                            id: uuidv4(),
-                                                            address:
-                                                                values.address
-                                                        }
-                                                    ]
+                                                if (values.address != '') {
+                                                    setMultipleAddress(
+                                                        (prev) => {
+                                                            const isMatch =
+                                                                prev.find(
+                                                                    (elem) =>
+                                                                        elem.address ===
+                                                                        values.address
+                                                                )
+                                                            if (!isMatch) {
+                                                                const array = [
+                                                                    {
+                                                                        id: uuidv4(),
+                                                                        address:
+                                                                            values.address
+                                                                    }
+                                                                ]
 
-                                                    return [...prev, ...array]
-                                                })
-                                                setFieldValue('address', '')
+                                                                return [
+                                                                    ...prev,
+                                                                    ...array
+                                                                ]
+                                                            } else {
+                                                                console.log(
+                                                                    'duplicate'
+                                                                )
+                                                                return prev
+                                                            }
+                                                        }
+                                                    )
+                                                    setFieldValue('address', '')
+                                                }
                                             }}
                                             type='button'
                                         >
