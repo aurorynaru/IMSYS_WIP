@@ -13,6 +13,44 @@ import { PlusCircleIcon } from '@heroicons/react/24/outline'
 import Alert from '../components/Alert'
 import { background } from '../functions/background'
 import { v4 as uuidv4 } from 'uuid'
+import { TrashIcon } from '@heroicons/react/24/outline'
+
+const initialValues = {
+    name: '',
+    credit_limit: '',
+    terms: '',
+    address: '',
+    tin: '',
+    multipleAddressValidation: false
+}
+
+const Schema = yup.object().shape({
+    name: yup.string().min(2).required('required'),
+    credit_limit: yup.string().required('Credit limit is required'),
+    terms: yup.number().min(1).required('required'),
+    address: yup
+        .string()
+        .when(
+            'multipleAddressValidation',
+            (multipleAddressValidation, schema) => {
+                console.log(multipleAddressValidation)
+                if (!multipleAddressValidation[0]) {
+                    return schema
+                        .min(5, '5 minimum characters required')
+                        .required('required')
+                } else {
+                    return schema
+                }
+            }
+        ),
+
+    tin: yup
+        .string()
+        .min(15, 'Tin number must be at least 12 numbers.')
+        .max(15, 'Tin number must be at max 12 numbers.')
+        .required('Tin number is required')
+})
+
 const ClientRegister = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -20,29 +58,6 @@ const ClientRegister = () => {
     const [successAlert, setSuccessAlert] = useState(false)
     const [multipleAddress, setMultipleAddress] = useState([])
     const [isMultipleAddress, setIsMultipleAddress] = useState(false)
-
-    const initialValues = {
-        name: '',
-        credit_limit: '',
-        terms: '',
-        address: '',
-        tin: ''
-    }
-
-    const Schema = yup.object().shape({
-        name: yup.string().min(2).required('required'),
-        credit_limit: yup.string().required('Credit limit is required'),
-        terms: yup.number().min(1).required('required'),
-        address: yup
-            .string()
-            .min(2, 'address must be at least 5 characters.')
-            .required('required'),
-        tin: yup
-            .string()
-            .min(15, 'Tin number must be at least 12 numbers.')
-            .max(15, 'Tin number must be at max 12 numbers.')
-            .required('Tin number is required')
-    })
 
     const formatNumber = (value) => {
         value = value.replace(/\D/g, '') // Remove any non-digit characters
@@ -79,6 +94,18 @@ const ClientRegister = () => {
         const formattedValue = Number(value).toLocaleString() // Convert to number and format
 
         return formattedValue
+    }
+
+    const deleteAddress = (index) => {
+        setMultipleAddress((prev) => {
+            const arr = prev.filter((elem, prevIndex) => {
+                if (index != prevIndex) {
+                    return elem
+                }
+            })
+
+            return arr
+        })
     }
 
     const handleSubmit = async (values, onSubmitProps) => {
@@ -261,16 +288,27 @@ const ClientRegister = () => {
                                 {isMultipleAddress && multipleAddress.length > 0
                                     ? multipleAddress.map((address, index) => {
                                           return (
-                                              <p
-                                                  key={address.id}
-                                                  className={` whitespace-nowrap px-1 py-1 text-sm ${background(
+                                              <div
+                                                  className={`flex items-center justify-between ${background(
                                                       index
-                                                  )}  `}
+                                                  )}`}
                                               >
-                                                  {`${index + 1}. ${
-                                                      address.address
-                                                  }`}
-                                              </p>
+                                                  <p
+                                                      key={address.id}
+                                                      className={` whitespace-nowrap px-1 py-1 text-sm   `}
+                                                  >
+                                                      {`${index + 1}. ${
+                                                          address.address
+                                                      }`}
+                                                  </p>
+                                                  <button
+                                                      onClick={() => {
+                                                          deleteAddress(index)
+                                                      }}
+                                                  >
+                                                      <TrashIcon className='h-5 w-5   text-error transition-transform duration-300 hover:-translate-y-1' />
+                                                  </button>
+                                              </div>
                                           )
                                       })
                                     : null}
@@ -337,8 +375,10 @@ const ClientRegister = () => {
                                             ? ' border-red-500 focus:ring-red-500'
                                             : ''
                                     } `}
+                                    type='text'
                                     value={values.address}
                                     onChange={handleChange}
+                                    name='address'
                                     id='address'
                                     placeholder='Client Address'
                                     onBlur={handleBlur}
@@ -351,12 +391,17 @@ const ClientRegister = () => {
                                         <span className='label-text'>
                                             Client multiple address
                                         </span>
-                                        <input
+                                        <Field
                                             onChange={() => {
                                                 setIsMultipleAddress(
                                                     (prev) => !prev
                                                 )
+                                                setFieldValue(
+                                                    'multipleAddressValidation',
+                                                    !values.multipleAddressValidation
+                                                )
                                             }}
+                                            name='multipleAddressValidation'
                                             type='checkbox'
                                             checked={
                                                 isMultipleAddress
