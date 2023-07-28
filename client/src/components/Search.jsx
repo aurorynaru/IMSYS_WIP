@@ -34,7 +34,8 @@ const Search = (props) => {
         setQuantity,
         setUnitPrice,
         setAmount,
-        setItemId
+        setItemId,
+        setClickedItems
     } = props
 
     return (
@@ -132,6 +133,7 @@ const Search = (props) => {
                     setAmount={setAmount}
                     setItemId={setItemId}
                     setFieldValue={setFieldValue}
+                    setClickedItems={setClickedItems}
                 />
             ) : (
                 <div className='mx-auto my-2 flex w-full items-center justify-center'>

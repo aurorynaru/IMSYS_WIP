@@ -17,7 +17,7 @@ const TableForm = (props) => {
         setUnitPrice,
         setAmount,
         setItemId,
-        setFieldValue
+        setClickedItems
     } = props
     const [headerArray, setHeader] = useState([])
     const [bodyArray, setBodyArray] = useState([])
@@ -127,7 +127,6 @@ const TableForm = (props) => {
                         onClick={() => {
                             if (selectedColumn != body._id) {
                                 setSelectedColumn(body._id)
-
                                 setUnit('')
                                 setDescription(description)
                                 setQuantity(0)
@@ -135,6 +134,24 @@ const TableForm = (props) => {
                                 setAmount(0)
                                 setItemId(_id)
                                 setTotalQuantity(quantity)
+
+                                setClickedItems((prev) => {
+                                    const obj = {}
+                                    const isMatch = prev.find(
+                                        (elem) => elem.id === _id
+                                    )
+
+                                    if (!isMatch) {
+                                        obj.quantity = quantity
+                                        obj.id = _id
+                                        obj.description = description
+                                        obj.price = price
+                                        console.log(obj)
+                                        return [...prev, obj]
+                                    } else {
+                                        return prev
+                                    }
+                                })
                             } else {
                                 setSelectedColumn(null)
                                 setDescription('')

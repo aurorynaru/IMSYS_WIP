@@ -9,6 +9,7 @@ const invoiceSchema = mongoose.Schema(
             required: true
         },
         items: { type: Array, required: true },
+        cost: { type: Array },
         date_created: {
             type: Date,
             required: true
@@ -24,10 +25,6 @@ const invoiceSchema = mongoose.Schema(
         recipient: {
             type: String
         },
-        delivery_to: {
-            type: String,
-            required: true
-        },
         user_id: {
             type: Schema.Types.ObjectId,
             ref: 'users'
@@ -36,11 +33,13 @@ const invoiceSchema = mongoose.Schema(
             type: Schema.Types.ObjectId,
             ref: 'delivery_receipts'
         },
+        posted_by: { type: Schema.Types.ObjectId, ref: 'users' },
         edited_by: [{ type: Schema.Types.ObjectId, ref: 'users', default: [] }],
         isBeingEdited: {
             type: Boolean,
             default: false
         },
+        editedBy: { type: Schema.Types.ObjectId, ref: 'users' },
         status: {
             type: String,
             enum: [

@@ -2,7 +2,7 @@ import React from 'react'
 import { tailwindError } from '../tailwindcss'
 
 const ErrorResponse = ({ error }) => {
-    return <p className={` ${tailwindError} `}>{error}</p>
+    return error ? <p className={` ${tailwindError} `}>{error}</p> : null
 }
 
 export default ErrorResponse

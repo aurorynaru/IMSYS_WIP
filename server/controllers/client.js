@@ -2,9 +2,17 @@ import { Client } from '../models/Clients.js'
 
 export const registerClient = async (req, res) => {
     try {
-        const { name, credit_limit, terms, address, tin } = req.body
+        const { name, credit_limit, terms, tin } = req.body
+
+        const address = req.body.singleAddress || req.body.multipleAddress
 
         const backToNum = parseInt(credit_limit.replace(/,/g, ''))
+
+        const isDuplicateTin = await Client.findOne({ tin: tin })
+
+        if (isDuplicateTin) {
+            return res.status(400).json({ error: 'duplicate tin number' })
+        }
 
         const newClient = new Client({
             name,

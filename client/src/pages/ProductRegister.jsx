@@ -38,7 +38,6 @@ const ProductRegister = () => {
     }
     //use multer
     const handleSubmit = async (values, onSubmitProps) => {
-        console.log(values)
         const savedUserResponse = await fetch(
             'http://localhost:8888/register/product',
             {

@@ -33,7 +33,6 @@ const Schema = yup.object().shape({
         .when(
             'multipleAddressValidation',
             (multipleAddressValidation, schema) => {
-                console.log(multipleAddressValidation)
                 if (!multipleAddressValidation[0]) {
                     return schema
                         .min(5, '5 minimum characters required')
@@ -109,6 +108,12 @@ const ClientRegister = () => {
     }
 
     const handleSubmit = async (values, onSubmitProps) => {
+        if (isMultipleAddress) {
+            values.multipleAddress = multipleAddress
+        } else {
+            values.singleAddress = [{ address: values.address, id: uuidv4() }]
+        }
+
         const savedClientResponse = await fetch(
             'http://localhost:8888/register/client',
             {
@@ -121,19 +126,19 @@ const ClientRegister = () => {
         )
 
         const savedClient = await savedClientResponse.json()
-        console.log(savedClient)
         if (savedClient.error) {
             setResError(savedClient.error)
         }
 
         if (savedClient) {
             if (!savedClient.error) {
-                console.log('yo')
                 setSuccessAlert(true)
                 onSubmitProps.resetForm()
                 setTimeout(() => {
                     setSuccessAlert(false)
                 }, 3000)
+                multipleAddress([])
+                setIsMultipleAddress(false)
             }
         }
     }
@@ -289,12 +294,12 @@ const ClientRegister = () => {
                                     ? multipleAddress.map((address, index) => {
                                           return (
                                               <div
+                                                  key={address.id}
                                                   className={`flex items-center justify-between ${background(
                                                       index
                                                   )}`}
                                               >
                                                   <p
-                                                      key={address.id}
                                                       className={` whitespace-nowrap px-1 py-1 text-sm   `}
                                                   >
                                                       {`${index + 1}. ${
@@ -370,7 +375,7 @@ const ClientRegister = () => {
                                 </div>
 
                                 <textarea
-                                    className={`input-primary input input-sm h-20 rounded-sm text-primary ${
+                                    className={`input-primary input input-sm h-20 rounded-sm leading-relaxed text-primary ${
                                         errors.address && touched.address
                                             ? ' border-red-500 focus:ring-red-500'
                                             : ''

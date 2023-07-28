@@ -20,6 +20,8 @@ const Table = (props) => {
     const body = props.selectedItems
 
     const {
+        clickedItems,
+        setTotalQuantity,
         setSelectedItems,
         creditUsed,
         setCreditUsed,
@@ -46,7 +48,7 @@ const Table = (props) => {
             return newArr
         })
     }
-
+    //EDIT HERE
     const editItem = (index) => {
         const { amount, description, quantity, unit, unitPrice } = body[index]
 

@@ -16,11 +16,16 @@ import TableForm from '../components/TableForm'
 import Search from '../components/Search'
 import { tailwindError } from '../tailwindcss'
 import Table from '../components/Table'
+import ComboBox from '../components/ComboBox'
+import ErrorResponse from '../functions/ErrorResponse'
+import Alert from '../components/Alert'
+
 const currentDate = new Date()
 
 const Invoice = ({ user }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const [successAlert, setSuccessAlert] = useState(false)
     const headerArray = ['Quantity', 'Brand', 'Description', 'Price']
     const [resError, setResError] = useState('')
     const [errorItem, setErrorItem] = useState(false)
@@ -28,9 +33,10 @@ const Invoice = ({ user }) => {
     const [totalSalesVat, setTotalSalesVat] = useState(0)
     const [vat, setVat] = useState(0)
     const [isClientSelected, setIsClientSelected] = useState(false)
-    const [status, setStatus] = useState('Invoice Status')
     const [creditLimit, setCreditLimit] = useState(0)
     const [creditUsed, setCreditUsed] = useState(0)
+    const [clientAddress, setClientAddress] = useState([])
+    const [status, setStatus] = useState('Pending')
 
     //supplier
     const [isLoadingClient, setIsLoadingClient] = useState(false)
@@ -45,6 +51,7 @@ const Invoice = ({ user }) => {
     const [amount, setAmount] = useState(0)
     const [itemId, setItemId] = useState(null)
     const [selectedItems, setSelectedItems] = useState([])
+    const [clickedItems, setClickedItems] = useState([])
 
     //pagination
     const [min, setMin] = useState(0)
@@ -82,7 +89,7 @@ const Invoice = ({ user }) => {
             .min(4, ' must be atleast 4 numbers')
             .required('required'),
         client: yup.string().min(3).max(100).required('required'),
-        address: yup.string().required('required'),
+        address: yup.string().required('address required'),
         date_created: yup.date().required('required'),
         due_date: yup.date().required('required'),
         terms: yup.number(),
@@ -95,18 +102,19 @@ const Invoice = ({ user }) => {
     })
 
     const handleSubmit = async (values) => {
-        const itemsOjb = {}
+        setResError('')
+        const cost = {}
 
-        itemsOjb.vatableSales = totalAmount.toFixed(2)
-        itemsOjb.TotalAmountDue = totalSalesVat.toFixed(2)
-        itemsOjb.vat = vat.toFixed(2)
+        cost.vatableSales = totalAmount.toFixed(2)
+        cost.TotalAmountDue = totalSalesVat.toFixed(2)
+        cost.vat = vat.toFixed(2)
 
         values.user_id = user.id
-
-        values.items.push(itemsOjb)
+        values.cost = cost
+        values.status = status
         console.log(values)
         const savedUserResponse = await fetch(
-            'http://localhost:8888/register/product',
+            'http://localhost:8888/create/invoice',
             {
                 method: 'POST',
                 headers: {
@@ -123,8 +131,12 @@ const Invoice = ({ user }) => {
 
         if (savedProduct) {
             if (!savedProduct.error) {
-                navigate('/register/product')
+                setSuccessAlert(true)
                 onSubmitProps.resetForm()
+                setTimeout(() => {
+                    setSuccessAlert(false)
+                }, 3000)
+                navigate('/create/invoice')
             }
         }
     }
@@ -141,7 +153,6 @@ const Invoice = ({ user }) => {
                 )
 
                 const newSearch = await response.json()
-                console.log(newSearch)
                 setSearchResultClient(newSearch)
                 setIsLoadingClient(false)
             }
@@ -345,898 +356,870 @@ const Invoice = ({ user }) => {
     return (
         <>
             <Navbar />
-            <div className='flex w-full'>
-                <Formik
-                    initialValues={initialValues}
-                    validationSchema={Schema}
-                    onSubmit={handleSubmit}
-                >
-                    {({
-                        errors,
-                        handleChange,
-                        handleSubmit,
-                        touched,
-                        values,
-                        setFieldValue,
-                        handleBlur
-                    }) => (
-                        <Form
-                            autoComplete='off'
-                            onSubmit={handleSubmit}
-                            className='mx-5 my-5 flex w-1/2 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-3 shadow-lg'
-                        >
-                            <div className='flex flex-col gap-3 px-2'>
-                                <h1 className='text-lg font-medium '>
-                                    Create Invoice
-                                </h1>
-                                <div className='flex w-full items-center gap-5 '>
-                                    <div className='flex w-1/2 flex-col gap-1 '>
-                                        <label
-                                            className='flex items-center text-left text-sm font-semibold text-neutral'
-                                            htmlFor='client'
-                                        >
-                                            Client Name
-                                            <span
-                                                className='tooltip tooltip-right ml-1 before:text-xs'
-                                                data-tip='client name'
-                                            >
-                                                <ExclamationCircleIcon className='h-5 w-5 text-neutral' />
-                                            </span>
-                                        </label>
 
-                                        <input
-                                            className={` input-primary input input-sm rounded-sm text-primary ${
-                                                errors.client && touched.client
-                                                    ? ` border-red-500 focus:ring-red-500`
-                                                    : ''
-                                            }`}
-                                            value={values.client}
-                                            onChange={(event) => {
-                                                const value = event.target.value
-                                                debounceSubmitClient(value)
-                                                setFieldValue('client', value)
-                                            }}
-                                            onBlur={handleBlur}
-                                            id='client'
-                                            placeholder='Enter client name'
-                                        ></input>
-                                        {searchResultClient.length > 0 ? (
-                                            <div className='min-w-1/2 max-w-3/4 z-40 flex h-fit  max-h-[180px] w-3/4 flex-col items-center overflow-auto  rounded-md border-2  border-gray-600 bg-base-300 p-2'>
-                                                {searchResultClient.map(
-                                                    (elem) => {
-                                                        if (elem) {
-                                                            return (
-                                                                <div
-                                                                    onMouseEnter={(
-                                                                        event
-                                                                    ) => {
-                                                                        const text =
-                                                                            event
-                                                                                .target
-                                                                                .innerText
-                                                                        const startDateObject =
-                                                                            new Date(
-                                                                                values.date_created
-                                                                            )
-                                                                        startDateObject.setDate(
-                                                                            startDateObject.getDate() +
-                                                                                elem.terms
-                                                                        )
-
-                                                                        const formattedDate =
-                                                                            startDateObject
-                                                                                .toISOString()
-                                                                                .split(
-                                                                                    'T'
-                                                                                )[0]
-
-                                                                        setFieldValue(
-                                                                            'client',
-                                                                            text
-                                                                        )
-                                                                        setFieldValue(
-                                                                            'tin',
-                                                                            elem.tin
-                                                                        )
-                                                                        setFieldValue(
-                                                                            'terms',
-                                                                            elem.terms
-                                                                        )
-
-                                                                        setCreditLimit(
-                                                                            elem.credit_limit
-                                                                        )
-
-                                                                        setFieldValue(
-                                                                            'address',
-                                                                            elem.address
-                                                                        )
-
-                                                                        setFieldValue(
-                                                                            'due_date',
-                                                                            formattedDate
-                                                                        )
-
-                                                                        setCreditUsed(
-                                                                            elem.credit_used
-                                                                        )
-                                                                    }}
-                                                                    onMouseLeave={() => {
-                                                                        setFieldValue(
-                                                                            'client',
-                                                                            ''
-                                                                        )
-                                                                        setFieldValue(
-                                                                            'tin',
-                                                                            ''
-                                                                        )
-                                                                        setFieldValue(
-                                                                            'terms',
-                                                                            ''
-                                                                        )
-                                                                        setCreditLimit(
-                                                                            0
-                                                                        )
-
-                                                                        setFieldValue(
-                                                                            'address',
-                                                                            ''
-                                                                        )
-                                                                        setFieldValue(
-                                                                            'due_date',
-                                                                            ''
-                                                                        )
-                                                                        setCreditUsed(
-                                                                            0.0
-                                                                        )
-                                                                    }}
-                                                                    onClick={(
-                                                                        event
-                                                                    ) => {
-                                                                        const text =
-                                                                            event
-                                                                                .target
-                                                                                .innerText
-
-                                                                        const startDateObject =
-                                                                            new Date(
-                                                                                values.date_created
-                                                                            )
-                                                                        startDateObject.setDate(
-                                                                            startDateObject.getDate() +
-                                                                                elem.terms
-                                                                        )
-
-                                                                        const formattedDate =
-                                                                            startDateObject
-                                                                                .toISOString()
-                                                                                .split(
-                                                                                    'T'
-                                                                                )[0]
-
-                                                                        setSearchResultClient(
-                                                                            []
-                                                                        )
-                                                                        setFieldValue(
-                                                                            'client',
-                                                                            text
-                                                                        )
-                                                                        setFieldValue(
-                                                                            'tin',
-                                                                            elem.tin
-                                                                        )
-                                                                        setFieldValue(
-                                                                            'terms',
-                                                                            elem.terms
-                                                                        )
-                                                                        setCreditLimit(
-                                                                            elem.credit_limit
-                                                                        )
-
-                                                                        setFieldValue(
-                                                                            'address',
-                                                                            elem.address
-                                                                        )
-
-                                                                        setFieldValue(
-                                                                            'due_date',
-                                                                            formattedDate
-                                                                        )
-
-                                                                        setFieldValue(
-                                                                            'clientId',
-                                                                            elem.id
-                                                                        )
-
-                                                                        setCreditUsed(
-                                                                            elem.credit_used
-                                                                        )
-
-                                                                        setIsClientSelected(
-                                                                            true
-                                                                        )
-                                                                    }}
-                                                                    className=' flex h-fit w-full cursor-pointer  items-center  justify-between rounded-md p-1 text-sm font-medium text-primary hover:bg-neutral hover:text-accent'
-                                                                    key={
-                                                                        elem.id
-                                                                    }
-                                                                >
-                                                                    <p>
-                                                                        {
-                                                                            elem.name
-                                                                        }
-                                                                    </p>
-                                                                </div>
-                                                            )
-                                                        }
-                                                    }
-                                                )}
-                                            </div>
-                                        ) : isLoadingClient ? (
-                                            <div className=' w-[50px]] flex h-[180px] max-h-[50px] flex-col  items-center justify-center   overflow-auto  rounded-md border-2  border-gray-600 bg-base-300'>
-                                                <span className='loading loading-spinner loading-md text-neutral '></span>
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                        {errorText(
-                                            errors.client,
-                                            touched.client
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='flex w-full items-center gap-5 px-2'>
-                                <div className='flex w-1/2 flex-col'>
+            <Formik
+                initialValues={initialValues}
+                validationSchema={Schema}
+                onSubmit={handleSubmit}
+            >
+                {({
+                    errors,
+                    handleChange,
+                    handleSubmit,
+                    touched,
+                    values,
+                    setFieldValue,
+                    handleBlur
+                }) => (
+                    <Form
+                        autoComplete='off'
+                        onSubmit={handleSubmit}
+                        className='mx-5 my-5 flex w-1/2 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-3 shadow-lg'
+                    >
+                        <div className='flex flex-col gap-3 px-2'>
+                            <h1 className='text-lg font-medium '>
+                                Create Invoice
+                            </h1>
+                            <div className='flex w-full items-center gap-5 '>
+                                <div className='relative flex w-1/2 flex-col gap-1'>
                                     <label
                                         className='flex items-center text-left text-sm font-semibold text-neutral'
                                         htmlFor='client'
                                     >
-                                        Invoice Number
-                                        <span className=' ml-1 '></span>
+                                        Client Name
+                                        <span
+                                            className='tooltip tooltip-right ml-1 before:text-xs'
+                                            data-tip='client name'
+                                        >
+                                            <ExclamationCircleIcon className='h-5 w-5 text-neutral' />
+                                        </span>
                                     </label>
 
-                                    <Field
+                                    <input
                                         className={` input-primary input input-sm rounded-sm text-primary ${
-                                            errors.invoice_number &&
-                                            touched.invoice_number
+                                            errors.client && touched.client
                                                 ? ` border-red-500 focus:ring-red-500`
                                                 : ''
                                         }`}
-                                        type='number'
-                                        name='invoice_number'
-                                        value={values.invoice_number}
-                                        onChange={handleChange}
+                                        value={values.client}
+                                        onChange={(event) => {
+                                            const value = event.target.value
+                                            debounceSubmitClient(value)
+                                            setFieldValue('client', value)
+                                        }}
                                         onBlur={handleBlur}
-                                        id='invoice_number'
-                                        placeholder='Enter invoice number '
-                                    ></Field>
+                                        id='client'
+                                        placeholder='Enter client name'
+                                    ></input>
+                                    {searchResultClient.length > 0 ? (
+                                        <div className='min-w-1/2 max-w-3/4 absolute top-16 z-40 flex  h-fit max-h-[180px] w-3/4 flex-col items-center  overflow-auto rounded-md  border-2  bg-base-300 p-2 shadow-lg'>
+                                            {searchResultClient.map((elem) => {
+                                                if (elem) {
+                                                    return (
+                                                        <div
+                                                            onMouseEnter={(
+                                                                event
+                                                            ) => {
+                                                                const text =
+                                                                    event.target
+                                                                        .innerText
+                                                                const startDateObject =
+                                                                    new Date(
+                                                                        values.date_created
+                                                                    )
+                                                                startDateObject.setDate(
+                                                                    startDateObject.getDate() +
+                                                                        elem.terms
+                                                                )
 
-                                    {errorText(
-                                        errors.invoice_number,
-                                        touched.invoice_number
+                                                                const formattedDate =
+                                                                    startDateObject
+                                                                        .toISOString()
+                                                                        .split(
+                                                                            'T'
+                                                                        )[0]
+
+                                                                setFieldValue(
+                                                                    'client',
+                                                                    text
+                                                                )
+                                                                setFieldValue(
+                                                                    'tin',
+                                                                    elem.tin
+                                                                )
+                                                                setFieldValue(
+                                                                    'terms',
+                                                                    elem.terms
+                                                                )
+
+                                                                setCreditLimit(
+                                                                    elem.credit_limit
+                                                                )
+
+                                                                setFieldValue(
+                                                                    'due_date',
+                                                                    formattedDate
+                                                                )
+
+                                                                setCreditUsed(
+                                                                    elem.credit_used
+                                                                )
+
+                                                                setClientAddress(
+                                                                    elem.address
+                                                                )
+                                                            }}
+                                                            onMouseLeave={() => {
+                                                                setFieldValue(
+                                                                    'client',
+                                                                    ''
+                                                                )
+                                                                setFieldValue(
+                                                                    'tin',
+                                                                    ''
+                                                                )
+                                                                setFieldValue(
+                                                                    'terms',
+                                                                    ''
+                                                                )
+                                                                setCreditLimit(
+                                                                    0
+                                                                )
+
+                                                                setFieldValue(
+                                                                    'due_date',
+                                                                    ''
+                                                                )
+                                                                setCreditUsed(
+                                                                    0.0
+                                                                )
+                                                                setClientAddress(
+                                                                    []
+                                                                )
+                                                            }}
+                                                            onClick={(
+                                                                event
+                                                            ) => {
+                                                                const text =
+                                                                    event.target
+                                                                        .innerText
+
+                                                                const startDateObject =
+                                                                    new Date(
+                                                                        values.date_created
+                                                                    )
+                                                                startDateObject.setDate(
+                                                                    startDateObject.getDate() +
+                                                                        elem.terms
+                                                                )
+
+                                                                const formattedDate =
+                                                                    startDateObject
+                                                                        .toISOString()
+                                                                        .split(
+                                                                            'T'
+                                                                        )[0]
+
+                                                                setSearchResultClient(
+                                                                    []
+                                                                )
+                                                                setFieldValue(
+                                                                    'client',
+                                                                    text
+                                                                )
+                                                                setFieldValue(
+                                                                    'tin',
+                                                                    elem.tin
+                                                                )
+                                                                setFieldValue(
+                                                                    'terms',
+                                                                    elem.terms
+                                                                )
+                                                                setCreditLimit(
+                                                                    elem.credit_limit
+                                                                )
+
+                                                                setFieldValue(
+                                                                    'due_date',
+                                                                    formattedDate
+                                                                )
+                                                                setClientAddress(
+                                                                    elem.address
+                                                                )
+
+                                                                setFieldValue(
+                                                                    'clientId',
+                                                                    elem.id
+                                                                )
+
+                                                                setCreditUsed(
+                                                                    elem.credit_used
+                                                                )
+
+                                                                setIsClientSelected(
+                                                                    true
+                                                                )
+                                                            }}
+                                                            className='flex h-fit min-h-fit w-full  cursor-pointer items-center justify-between rounded-md p-1 text-sm font-medium text-primary hover:bg-neutral hover:text-accent'
+                                                            key={elem.id}
+                                                        >
+                                                            <p>{elem.name}</p>
+                                                        </div>
+                                                    )
+                                                }
+                                            })}
+                                        </div>
+                                    ) : isLoadingClient ? (
+                                        <div className=' min-w-1/2 absolute top-16 flex h-[180px] max-h-[50px] w-full flex-col  items-center justify-center   overflow-auto  rounded-md border-2   bg-base-300'>
+                                            <span className='loading loading-spinner loading-md px-2 text-neutral'></span>
+                                        </div>
+                                    ) : (
+                                        ''
                                     )}
-                                </div>
-                                <div className='flex w-1/2 flex-col'>
-                                    <label
-                                        className='flex items-center text-left text-sm font-semibold text-neutral'
-                                        htmlFor='recipient'
-                                    >
-                                        Recipient Name
-                                        <span className=' ml-1 '></span>
-                                    </label>
-
-                                    <Field
-                                        className={` input-primary input input-sm rounded-sm text-primary ${
-                                            errors.recipient &&
-                                            touched.recipient
-                                                ? ` border-red-500 focus:ring-red-500`
-                                                : ''
-                                        }`}
-                                        type='string'
-                                        name='recipient'
-                                        value={values.recipient}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        id='recipient'
-                                        placeholder='Enter Recipient Name'
-                                    ></Field>
-
-                                    {errorText(
-                                        errors.recipient,
-                                        touched.recipient
-                                    )}
+                                    {errorText(errors.client, touched.client)}
                                 </div>
                             </div>
-
-                            <div className='flex flex-col gap-3 px-2'>
+                        </div>
+                        <div className='flex w-full items-center gap-5 px-2'>
+                            <div className='flex w-1/2 flex-col'>
                                 <label
-                                    className='text-sm font-semibold text-neutral'
-                                    htmlFor='description'
+                                    className='flex items-center text-left text-sm font-semibold text-neutral'
+                                    htmlFor='client'
                                 >
-                                    Client address
+                                    Invoice Number
+                                    <span className=' ml-1 '></span>
                                 </label>
 
-                                <textarea
-                                    className={`input-primary input input-sm h-20 rounded-sm text-primary ${
-                                        errors.address && touched.address
-                                            ? ' border-red-500 focus:ring-red-500'
+                                <Field
+                                    className={` input-primary input input-sm rounded-sm text-primary ${
+                                        errors.invoice_number &&
+                                        touched.invoice_number
+                                            ? ` border-red-500 focus:ring-red-500`
                                             : ''
-                                    } `}
-                                    value={values.address}
+                                    }`}
+                                    type='number'
+                                    name='invoice_number'
+                                    value={values.invoice_number}
                                     onChange={handleChange}
-                                    id='address'
-                                    placeholder='Client Address'
                                     onBlur={handleBlur}
-                                ></textarea>
-                                {errorText(errors.address, touched.address)}
+                                    id='invoice_number'
+                                    placeholder='Enter invoice number '
+                                ></Field>
+
+                                {errorText(
+                                    errors.invoice_number,
+                                    touched.invoice_number
+                                )}
                             </div>
-                            <div className='mb-2 w-full p-2'>
-                                <div className='flex w-full  justify-end'>
-                                    <div className='w-1/4'>
-                                        <label
-                                            className='tooltip flex items-center text-left text-sm font-semibold text-neutral'
-                                            htmlFor='terms'
-                                        >
-                                            Client Terms
-                                            <span
-                                                className='tooltip  tooltip-right ml-1'
-                                                data-tip='amount in days'
-                                            >
-                                                <ExclamationCircleIcon className='h-5 w-5 text-neutral' />
-                                            </span>
-                                        </label>
+                            <div className='flex w-1/2 flex-col'>
+                                <label
+                                    className='flex items-center text-left text-sm font-semibold text-neutral'
+                                    htmlFor='recipient'
+                                >
+                                    Recipient Name
+                                    <span className=' ml-1 '></span>
+                                </label>
 
-                                        <Field
-                                            className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                                errors.terms && touched.terms
-                                                    ? ' border-red-500 focus:ring-red-500'
-                                                    : ''
-                                            } `}
-                                            name='terms'
-                                            type='number'
-                                            onChange={(event) => {
-                                                let value = parseInt(
-                                                    event.target.value
-                                                )
+                                <Field
+                                    className={` input-primary input input-sm rounded-sm text-primary ${
+                                        errors.recipient && touched.recipient
+                                            ? ` border-red-500 focus:ring-red-500`
+                                            : ''
+                                    }`}
+                                    type='string'
+                                    name='recipient'
+                                    value={values.recipient}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    id='recipient'
+                                    placeholder='Enter Recipient Name'
+                                ></Field>
 
-                                                if (!value) {
-                                                    value = 0
-                                                }
-
-                                                const startDateObject =
-                                                    new Date(
-                                                        values.date_created
-                                                    )
-                                                startDateObject.setDate(
-                                                    startDateObject.getDate() +
-                                                        value
-                                                )
-
-                                                const formattedDate =
-                                                    startDateObject
-                                                        .toISOString()
-                                                        .split('T')[0]
-
-                                                setFieldValue('terms', value)
-
-                                                setFieldValue(
-                                                    'due_date',
-                                                    formattedDate
-                                                )
-                                            }}
-                                            onBlur={handleBlur}
-                                            value={values.terms}
-                                        />
-
-                                        {errorText(errors.terms, touched.terms)}
-                                    </div>
-                                </div>
-                                <div className='flex w-full items-center justify-between gap-10'>
-                                    <div className='flex w-1/2 flex-col'>
-                                        <label
-                                            className='text-sm font-semibold text-neutral'
-                                            htmlFor='date_created'
-                                        >
-                                            Date
-                                        </label>
-
-                                        <Field
-                                            className={`input-primary input input-sm rounded-sm text-primary ${
-                                                errors.date_created &&
-                                                touched.date_created
-                                                    ? ' border-red-500 focus:ring-red-500'
-                                                    : ''
-                                            } `}
-                                            name='date_created'
-                                            type='date'
-                                            onChange={(event) => {
-                                                const value = event.target.value
-                                                setFieldValue(
-                                                    'date_created',
-                                                    value
-                                                )
-                                                setCreatedDate(value)
-                                            }}
-                                            onBlur={handleBlur}
-                                            value={values.date_created}
-                                        />
-                                    </div>
-
-                                    <div className='flex w-1/2 flex-col'>
-                                        <label
-                                            className='tooltip flex items-center text-left text-sm font-semibold text-neutral'
-                                            htmlFor='terms'
-                                        >
-                                            Due Date
-                                            <span
-                                                className='tooltip  tooltip-right ml-1'
-                                                data-tip='Edit client terms to change'
-                                            >
-                                                <ExclamationCircleIcon className='h-5 w-5 text-neutral' />
-                                            </span>
-                                        </label>
-
-                                        <Field
-                                            className={`input-primary input input-sm cursor-not-allowed rounded-sm  text-primary ${
-                                                errors.due_date &&
-                                                touched.due_date
-                                                    ? ' border-red-500 focus:ring-red-500'
-                                                    : ''
-                                            } `}
-                                            name='due_date'
-                                            type='date'
-                                            readOnly={true}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            value={values.due_date}
-                                        />
-                                    </div>
-                                </div>
+                                {errorText(errors.recipient, touched.recipient)}
                             </div>
-                            <div className='flex w-full items-center gap-5 px-2'>
-                                <div className='flex w-1/2 flex-col'>
+                        </div>
+
+                        <div className='flex flex-col gap-3 px-2'>
+                            <label
+                                className='text-sm font-semibold text-neutral'
+                                htmlFor='description'
+                            >
+                                Client address
+                            </label>
+
+                            <textarea
+                                className={`input-primary input input-sm h-20 rounded-sm py-2 leading-relaxed text-primary ${
+                                    errors.address && touched.address
+                                        ? ' border-red-500 focus:ring-red-500'
+                                        : ''
+                                } `}
+                                value={values.address}
+                                onChange={handleChange}
+                                id='address'
+                                placeholder='Client Address'
+                                onBlur={handleBlur}
+                            ></textarea>
+                            {clientAddress.length > 0 ? (
+                                <div className=' z-40 rounded-md rounded-t-none border-2 border-t-0 border-neutral'>
+                                    <div className='w-full bg-neutral px-2'>
+                                        <label className='text-primary'>
+                                            Address List
+                                        </label>
+                                    </div>
+                                    <ComboBox
+                                        array={clientAddress}
+                                        setFieldValue={setFieldValue}
+                                    />
+                                </div>
+                            ) : null}
+                            {errorText(errors.address, touched.address)}
+                        </div>
+                        <div className='mb-2 w-full p-2'>
+                            <div className='flex w-full  justify-end'>
+                                <div className='w-1/4'>
                                     <label
-                                        className='text-sm font-semibold text-neutral'
-                                        htmlFor='tin'
+                                        className='tooltip flex items-center text-left text-sm font-semibold text-neutral'
+                                        htmlFor='terms'
                                     >
-                                        Tin number
+                                        Client Terms
+                                        <span
+                                            className='tooltip  tooltip-right ml-1'
+                                            data-tip='amount in days'
+                                        >
+                                            <ExclamationCircleIcon className='h-5 w-5 text-neutral' />
+                                        </span>
                                     </label>
+
                                     <Field
                                         className={`input-primary input input-sm w-full rounded-sm text-primary ${
-                                            errors.tin && touched.tin
+                                            errors.terms && touched.terms
                                                 ? ' border-red-500 focus:ring-red-500'
                                                 : ''
                                         } `}
-                                        name='tin'
-                                        type='text'
-                                        onChange={handleChange}
+                                        name='terms'
+                                        type='number'
+                                        onChange={(event) => {
+                                            let value = parseInt(
+                                                event.target.value
+                                            )
+
+                                            if (!value) {
+                                                value = 0
+                                            }
+
+                                            const startDateObject = new Date(
+                                                values.date_created
+                                            )
+                                            startDateObject.setDate(
+                                                startDateObject.getDate() +
+                                                    value
+                                            )
+
+                                            const formattedDate =
+                                                startDateObject
+                                                    .toISOString()
+                                                    .split('T')[0]
+
+                                            setFieldValue('terms', value)
+
+                                            setFieldValue(
+                                                'due_date',
+                                                formattedDate
+                                            )
+                                        }}
                                         onBlur={handleBlur}
-                                        value={formatNumber(values.tin)}
+                                        value={values.terms}
                                     />
-                                    {errorText(errors.tin, touched.tin)}
+
+                                    {errorText(errors.terms, touched.terms)}
                                 </div>
                             </div>
-                            <div className=' flex w-full flex-col '>
-                                <div className='sat'>
-                                    <Search
-                                        setItems={setItemsObject}
-                                        items={itemsObject}
-                                        setPage={setPage}
-                                        searchFunction={handleSearchProduct}
-                                        setBrand={setBrand}
-                                        setDesc={setDesc}
-                                        minFunction={setMin}
-                                        minPrice={min}
-                                        maxFunction={setMax}
-                                        maxPrice={max}
-                                        sortPrice={sortPagePrice}
-                                        sortPriceFunction={setSortPagePrice}
-                                        sortQuantity={sortPageQuantity}
-                                        sortQuantityFunction={
-                                            setSortPageQuantity
-                                        }
-                                        setItemId={setItemId}
-                                        setUnit={setUnit}
-                                        setDescription={setDescription}
-                                        setQuantity={setQuantity}
-                                        setUnitPrice={setUnitPrice}
-                                        setAmount={setAmount}
-                                        sortDescFunction={setSortPageDesc}
-                                        sortBrandFunction={setSortPageBrandName}
-                                        brandNameSearch={brandNameSearch}
-                                        setBrandNameSearch={setBrandNameSearch}
-                                        descSearch={descSearch}
-                                        setDescSearch={setDescSearch}
-                                        setFieldValue={setFieldValue}
-                                        setTotalQuantity={setTotalQuantity}
-                                        headerArray={headerArray}
+                            <div className='flex w-full items-center justify-between gap-10'>
+                                <div className='flex w-1/2 flex-col'>
+                                    <label
+                                        className='text-sm font-semibold text-neutral'
+                                        htmlFor='date_created'
+                                    >
+                                        Date
+                                    </label>
+
+                                    <Field
+                                        className={`input-primary input input-sm rounded-sm text-primary ${
+                                            errors.date_created &&
+                                            touched.date_created
+                                                ? ' border-red-500 focus:ring-red-500'
+                                                : ''
+                                        } `}
+                                        name='date_created'
+                                        type='date'
+                                        onChange={(event) => {
+                                            const value = event.target.value
+                                            setFieldValue('date_created', value)
+                                            setCreatedDate(value)
+                                        }}
+                                        onBlur={handleBlur}
+                                        value={values.date_created}
                                     />
                                 </div>
-                                <div className='flex flex-col gap-3 border-2 border-l-0 border-r-0 border-primary p-2'>
-                                    <div className='flex'>
-                                        <div className='w-full'>
-                                            <label
-                                                className='text-sm font-semibold text-neutral'
-                                                htmlFor='description'
-                                            >
-                                                Description
-                                            </label>
-                                            <input
-                                                className={`input-primary input input-sm w-full rounded-sm text-primary`}
-                                                name='description'
-                                                type='text'
-                                                disabled={
-                                                    isClientSelected
-                                                        ? false
-                                                        : true
-                                                }
-                                                onChange={(event) => {
-                                                    const value =
-                                                        event.target.value
-                                                    setDescription(value)
-                                                }}
-                                                value={description}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className='flex w-full items-center gap-5 '>
-                                        <div className='flex  flex-col'>
-                                            <label
-                                                className='text-sm font-semibold text-neutral'
-                                                htmlFor='quantity'
-                                            >
-                                                Quantity
-                                            </label>
 
-                                            <input
-                                                className={`input-primary input input-sm w-full rounded-sm text-primary`}
-                                                name='quantity'
-                                                type='number'
-                                                disabled={
-                                                    isClientSelected
-                                                        ? false
-                                                        : true
-                                                }
-                                                onChange={(event) => {
-                                                    const value =
-                                                        event.target.value
-                                                    const totalAmt =
-                                                        value * unitPrice
+                                <div className='flex w-1/2 flex-col'>
+                                    <label
+                                        className='tooltip flex items-center text-left text-sm font-semibold text-neutral'
+                                        htmlFor='terms'
+                                    >
+                                        Due Date
+                                        <span
+                                            className='tooltip  tooltip-right ml-1'
+                                            data-tip='Edit client terms to change'
+                                        >
+                                            <ExclamationCircleIcon className='h-5 w-5 text-neutral' />
+                                        </span>
+                                    </label>
 
-                                                    setAmount(totalAmt)
-                                                    setQuantity(value)
-                                                }}
-                                                value={quantity}
-                                            />
-                                        </div>
-                                        <div className='flex  flex-col'>
-                                            <label
-                                                className='text-sm font-semibold text-neutral'
-                                                htmlFor='unit'
-                                            >
-                                                Unit
-                                            </label>
-                                            <input
-                                                className={`input-primary input input-sm w-full rounded-sm text-primary`}
-                                                name='unit'
-                                                disabled={
-                                                    isClientSelected
-                                                        ? false
-                                                        : true
-                                                }
-                                                type='text'
-                                                onChange={(event) => {
-                                                    const value =
-                                                        event.target.value
-                                                    setUnit(value)
-                                                }}
-                                                value={unit}
-                                            />
-                                        </div>
+                                    <Field
+                                        className={`input-primary input input-sm cursor-not-allowed rounded-sm  text-primary ${
+                                            errors.due_date && touched.due_date
+                                                ? ' border-red-500 focus:ring-red-500'
+                                                : ''
+                                        } `}
+                                        name='due_date'
+                                        type='date'
+                                        readOnly={true}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        value={values.due_date}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className='flex w-full items-center gap-5 px-2'>
+                            <div className='flex w-1/2 flex-col'>
+                                <label
+                                    className='text-sm font-semibold text-neutral'
+                                    htmlFor='tin'
+                                >
+                                    Tin number
+                                </label>
+                                <Field
+                                    className={`input-primary input input-sm w-full rounded-sm text-primary ${
+                                        errors.tin && touched.tin
+                                            ? ' border-red-500 focus:ring-red-500'
+                                            : ''
+                                    } `}
+                                    name='tin'
+                                    type='text'
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={formatNumber(values.tin)}
+                                />
+                                {errorText(errors.tin, touched.tin)}
+                            </div>
+                        </div>
+                        <div className=' flex w-full flex-col '>
+                            <div className='sat'>
+                                <Search
+                                    setItems={setItemsObject}
+                                    items={itemsObject}
+                                    setPage={setPage}
+                                    searchFunction={handleSearchProduct}
+                                    setBrand={setBrand}
+                                    setDesc={setDesc}
+                                    minFunction={setMin}
+                                    minPrice={min}
+                                    maxFunction={setMax}
+                                    maxPrice={max}
+                                    sortPrice={sortPagePrice}
+                                    sortPriceFunction={setSortPagePrice}
+                                    sortQuantity={sortPageQuantity}
+                                    sortQuantityFunction={setSortPageQuantity}
+                                    setItemId={setItemId}
+                                    setUnit={setUnit}
+                                    setDescription={setDescription}
+                                    setQuantity={setQuantity}
+                                    setUnitPrice={setUnitPrice}
+                                    setAmount={setAmount}
+                                    sortDescFunction={setSortPageDesc}
+                                    sortBrandFunction={setSortPageBrandName}
+                                    brandNameSearch={brandNameSearch}
+                                    setBrandNameSearch={setBrandNameSearch}
+                                    descSearch={descSearch}
+                                    setDescSearch={setDescSearch}
+                                    setFieldValue={setFieldValue}
+                                    setTotalQuantity={setTotalQuantity}
+                                    headerArray={headerArray}
+                                    setClickedItems={setClickedItems}
+                                />
+                            </div>
 
-                                        <div className='flex  flex-col'>
-                                            <label
-                                                className='text-sm font-semibold text-neutral'
-                                                htmlFor='unitPrice'
-                                            >
-                                                Unit Price
-                                            </label>
-                                            <input
-                                                className={`input-primary input input-sm w-full rounded-sm text-primary`}
-                                                name='unitPrice'
-                                                disabled={
-                                                    isClientSelected
-                                                        ? false
-                                                        : true
-                                                }
-                                                type='text'
-                                                onChange={(event) => {
-                                                    const value =
-                                                        event.target.value
-                                                    setUnitPrice(value)
-                                                }}
-                                                value={unitPrice}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className='w-1/3'>
+                            <div className='flex flex-col gap-3 border-2 border-l-0 border-r-0 border-primary p-2'>
+                                <div className='flex'>
+                                    <div className='w-full'>
                                         <label
                                             className='text-sm font-semibold text-neutral'
-                                            htmlFor='amount'
+                                            htmlFor='description'
                                         >
-                                            Amount
+                                            Description
                                         </label>
                                         <input
                                             className={`input-primary input input-sm w-full rounded-sm text-primary`}
-                                            name='amount'
+                                            name='description'
+                                            type='text'
+                                            disabled={
+                                                isClientSelected ? false : true
+                                            }
+                                            onChange={(event) => {
+                                                const value = event.target.value
+                                                setDescription(value)
+                                            }}
+                                            value={description}
+                                        />
+                                    </div>
+                                </div>
+                                <div className='flex w-full items-center gap-5 '>
+                                    <div className='flex  flex-col'>
+                                        <label
+                                            className='text-sm font-semibold text-neutral'
+                                            htmlFor='quantity'
+                                        >
+                                            Quantity
+                                        </label>
+
+                                        <input
+                                            className={`input-primary input input-sm w-full rounded-sm text-primary`}
+                                            name='quantity'
+                                            type='number'
+                                            disabled={
+                                                isClientSelected ? false : true
+                                            }
+                                            onChange={(event) => {
+                                                const value = event.target.value
+                                                const totalAmt =
+                                                    value * unitPrice
+
+                                                setAmount(totalAmt)
+                                                setQuantity(value)
+                                            }}
+                                            value={quantity}
+                                        />
+                                    </div>
+                                    <div className='flex  flex-col'>
+                                        <label
+                                            className='text-sm font-semibold text-neutral'
+                                            htmlFor='unit'
+                                        >
+                                            Unit
+                                        </label>
+                                        <input
+                                            className={`input-primary input input-sm w-full rounded-sm text-primary`}
+                                            name='unit'
                                             disabled={
                                                 isClientSelected ? false : true
                                             }
                                             type='text'
                                             onChange={(event) => {
                                                 const value = event.target.value
-                                                setAmount(value)
+                                                setUnit(value)
                                             }}
-                                            value={amount}
+                                            value={unit}
                                         />
                                     </div>
-                                    {errorItem && (
-                                        <p
-                                            className={` ${tailwindError} my-2 text-center font-bold`}
+
+                                    <div className='flex  flex-col'>
+                                        <label
+                                            className='text-sm font-semibold text-neutral'
+                                            htmlFor='unitPrice'
                                         >
-                                            {errorItem &&
-                                            totalQuantity < quantity
-                                                ? 'quantity is greater that available item stock '
-                                                : 'Incomplete values / Invalid values'}
-                                        </p>
-                                    )}
-                                    <div
-                                        className={`flex w-full items-center justify-center ${
-                                            isClientSelected
-                                                ? 'cursor-default'
-                                                : 'cursor-not-allowed'
-                                        }`}
-                                    >
-                                        <button
-                                            type='button'
+                                            Unit Price
+                                        </label>
+                                        <input
+                                            className={`input-primary input input-sm w-full rounded-sm text-primary`}
+                                            name='unitPrice'
                                             disabled={
                                                 isClientSelected ? false : true
                                             }
-                                            onClick={() => {
-                                                const obj = {}
-                                                if (
-                                                    quantity === '' ||
-                                                    amount === '' ||
-                                                    description === '' ||
-                                                    unit === '' ||
-                                                    unitPrice === ''
-                                                ) {
-                                                    setErrorItem(true)
-                                                    return
-                                                }
-
-                                                if (totalQuantity < quantity) {
-                                                    setErrorItem(true)
-                                                    return
-                                                }
-                                                if (
-                                                    description &&
-                                                    unitPrice &&
-                                                    quantity &&
-                                                    unit &&
-                                                    amount
-                                                ) {
-                                                    const isMatch =
-                                                        selectedItems.find(
-                                                            (item) =>
-                                                                item.description ===
-                                                                description
-                                                        )
-                                                    if (!isMatch) {
-                                                        obj.description =
-                                                            description
-                                                        obj.unitPrice =
-                                                            unitPrice
-                                                        obj.quantity = quantity
-                                                        obj.unit = unit
-                                                        obj.amount = amount
-                                                        obj.id = itemId
-                                                        setErrorItem(false)
-                                                        setSelectedItems(
-                                                            (prev) => {
-                                                                const arr = [
-                                                                    obj
-                                                                ]
-                                                                const ItemsArray =
-                                                                    [
-                                                                        ...prev,
-                                                                        ...arr
-                                                                    ]
-
-                                                                setFieldValue(
-                                                                    'items',
-                                                                    [
-                                                                        ...prev,
-                                                                        ...arr
-                                                                    ]
-                                                                )
-
-                                                                return ItemsArray
-                                                            }
-                                                        )
-
-                                                        const total =
-                                                            amount + creditUsed
-
-                                                        setCreditUsed(total)
-                                                        setItemId('')
-                                                        setUnit('')
-                                                        setDescription('')
-                                                        setQuantity(0)
-                                                        setUnitPrice(0)
-                                                        setAmount(0)
-                                                        setTotalQuantity(0)
-                                                    } else {
-                                                        console.log('duplicate')
-                                                    }
-                                                } else {
-                                                    setErrorItem(true)
-                                                }
-                                            }}
-                                            className='btn-neutral btn-active btn-wide btn-sm btn hover:text-secondary'
-                                        >
-                                            Add new item
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className=''>
-                                    {itemsObject ? (
-                                        <Table
-                                            headerArray={headerArray}
-                                            setSelectedItems={setSelectedItems}
-                                            selectedItems={selectedItems}
-                                            setFieldValue={setFieldValue}
-                                            setUnit={setUnit}
-                                            setDescription={setDescription}
-                                            setQuantity={setQuantity}
-                                            setUnitPrice={setUnitPrice}
-                                            setAmount={setAmount}
-                                            creditUsed={creditUsed}
-                                            setCreditUsed={setCreditUsed}
-                                            setTotalAmount={setTotalAmount}
-                                            setTotalSalesVat={setTotalSalesVat}
-                                            setVat={setVat}
-                                        />
-                                    ) : (
-                                        <div className='mx-auto my-2 flex w-full items-center justify-center'>
-                                            <span className='loading loading-spinner loading-lg'></span>
-                                        </div>
-                                    )}
-
-                                    <div className='w-full  bg-base-100 px-2 py-2'>
-                                        <div className='flex flex-col gap-4'>
-                                            <div className='flex justify-end '>
-                                                <p
-                                                    className='tooltip tooltip-right font-bold before:text-xs'
-                                                    data-tip={`Remaining: ${
-                                                        creditLimit -
-                                                        creditUsed.toFixed(2)
-                                                    }`}
-                                                >
-                                                    Credit Limit:{' '}
-                                                    {creditUsed.toFixed(2)}/{' '}
-                                                    {creditLimit
-                                                        ? creditLimit.toFixed(2)
-                                                        : 0}
-                                                </p>
-                                            </div>
-
-                                            <div className='flex  justify-end'>
-                                                <p className='font-bold'>
-                                                    {`TOTAL SALES (VAT inclusive): ${totalSalesVat.toFixed(
-                                                        2
-                                                    )}`}
-                                                </p>
-                                            </div>
-                                            <div className='flex  justify-between'>
-                                                <p className='font-bold '>
-                                                    VATable Sales:
-                                                    {` ${totalAmount.toFixed(
-                                                        2
-                                                    )}`}
-                                                </p>
-                                                <p className='font-bold'>
-                                                    Less: VAT: {vat.toFixed(2)}{' '}
-                                                </p>
-                                            </div>
-                                            <div className='flex  justify-end'>
-                                                <p className='font-bold'>
-                                                    Amount: NET of VAT{' '}
-                                                    {totalAmount.toFixed(2)}{' '}
-                                                </p>
-                                            </div>
-                                            <div className='flex justify-between'>
-                                                <p className='font-bold'>
-                                                    VAT 12%: {vat.toFixed(2)}{' '}
-                                                </p>
-                                                <p className='font-bold '>
-                                                    Total Amount Due:{' '}
-                                                    {totalSalesVat.toFixed(2)}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='my-2 flex justify-end px-2'>
-                                    <div className='flex flex-col'>
-                                        <select
-                                            disabled={
-                                                totalSalesVat > creditLimit
-                                                    ? true
-                                                    : false
-                                            }
-                                            name='status'
-                                            value={status}
+                                            type='text'
                                             onChange={(event) => {
                                                 const value = event.target.value
-                                                setStatus(value)
+                                                setUnitPrice(value)
                                             }}
-                                            className='select-primary select select-sm rounded-sm'
-                                        >
-                                            <option disabled value=''>
-                                                Invoice Status...
-                                            </option>
+                                            value={unitPrice}
+                                        />
+                                    </div>
+                                </div>
 
-                                            <option>Pending</option>
-                                            <option>Pending Override</option>
-                                            <option>To follow</option>
-                                        </select>
+                                <div className='w-1/3'>
+                                    <label
+                                        className='text-sm font-semibold text-neutral'
+                                        htmlFor='amount'
+                                    >
+                                        Amount
+                                    </label>
+                                    <input
+                                        className={`input-primary input input-sm w-full rounded-sm text-primary`}
+                                        name='amount'
+                                        disabled={
+                                            isClientSelected ? false : true
+                                        }
+                                        type='text'
+                                        onChange={(event) => {
+                                            const value = event.target.value
+                                            setAmount(value)
+                                        }}
+                                        value={amount.toFixed(2)}
+                                    />
+                                </div>
+
+                                {errorItem && (
+                                    <p
+                                        className={` ${tailwindError} my-2 text-center font-bold`}
+                                    >
+                                        {errorItem && totalQuantity < quantity
+                                            ? 'quantity is greater that available item stock '
+                                            : 'Incomplete values / Invalid values'}
+                                    </p>
+                                )}
+                                <div
+                                    className={`flex w-full items-center justify-center ${
+                                        isClientSelected
+                                            ? 'cursor-default'
+                                            : 'cursor-not-allowed'
+                                    }`}
+                                >
+                                    <button
+                                        type='button'
+                                        disabled={
+                                            isClientSelected ? false : true
+                                        }
+                                        onClick={() => {
+                                            const obj = {}
+                                            if (
+                                                quantity === '' ||
+                                                amount === '' ||
+                                                description === '' ||
+                                                unit === '' ||
+                                                unitPrice === ''
+                                            ) {
+                                                setErrorItem(true)
+                                                return
+                                            }
+
+                                            if (totalQuantity < quantity) {
+                                                setErrorItem(true)
+                                                return
+                                            }
+                                            if (
+                                                description &&
+                                                unitPrice &&
+                                                quantity &&
+                                                unit &&
+                                                amount
+                                            ) {
+                                                const isMatch =
+                                                    selectedItems.find(
+                                                        (item) =>
+                                                            item.description ===
+                                                            description
+                                                    )
+                                                if (!isMatch) {
+                                                    obj.description =
+                                                        description
+                                                    obj.unitPrice = unitPrice
+                                                    obj.quantity = quantity
+                                                    obj.unit = unit
+                                                    obj.amount = amount
+                                                    obj.id = itemId
+                                                    setErrorItem(false)
+                                                    setSelectedItems((prev) => {
+                                                        const arr = [obj]
+                                                        const ItemsArray = [
+                                                            ...prev,
+                                                            ...arr
+                                                        ]
+
+                                                        setFieldValue('items', [
+                                                            ...prev,
+                                                            ...arr
+                                                        ])
+
+                                                        return ItemsArray
+                                                    })
+
+                                                    const total =
+                                                        amount + creditUsed
+
+                                                    setCreditUsed(total)
+                                                    setItemId('')
+                                                    setUnit('')
+                                                    setDescription('')
+                                                    setQuantity(0)
+                                                    setUnitPrice(0)
+                                                    setAmount(0)
+                                                    setTotalQuantity(0)
+                                                } else {
+                                                    console.log('duplicate')
+                                                }
+                                            } else {
+                                                setErrorItem(true)
+                                            }
+                                        }}
+                                        className='btn-neutral btn-active btn-wide btn-sm btn hover:text-secondary'
+                                    >
+                                        Add new item
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className=''>
+                                {itemsObject ? (
+                                    <Table
+                                        headerArray={headerArray}
+                                        setSelectedItems={setSelectedItems}
+                                        selectedItems={selectedItems}
+                                        setFieldValue={setFieldValue}
+                                        setUnit={setUnit}
+                                        setDescription={setDescription}
+                                        setQuantity={setQuantity}
+                                        setUnitPrice={setUnitPrice}
+                                        setAmount={setAmount}
+                                        creditUsed={creditUsed}
+                                        setCreditUsed={setCreditUsed}
+                                        setTotalAmount={setTotalAmount}
+                                        setTotalSalesVat={setTotalSalesVat}
+                                        setVat={setVat}
+                                        setTotalQuantity={setTotalQuantity}
+                                        clickedItems={clickedItems}
+                                    />
+                                ) : (
+                                    <div className='mx-auto my-2 flex w-full items-center justify-center'>
+                                        <span className='loading loading-spinner loading-lg'></span>
+                                    </div>
+                                )}
+
+                                <div className='w-full  bg-base-100 px-2 py-2'>
+                                    <div className='flex flex-col gap-4'>
+                                        <div className='flex justify-end '>
+                                            <p
+                                                className='tooltip tooltip-right font-bold before:text-xs'
+                                                data-tip={`Remaining: ${
+                                                    creditLimit -
+                                                    creditUsed.toFixed(2)
+                                                }`}
+                                            >
+                                                Credit Limit:{' '}
+                                                {creditUsed.toFixed(2)}/{' '}
+                                                {creditLimit
+                                                    ? creditLimit.toFixed(2)
+                                                    : 0}
+                                            </p>
+                                        </div>
+
+                                        <div className='flex  justify-end'>
+                                            <p className='font-bold'>
+                                                {`TOTAL SALES (VAT inclusive): ${totalSalesVat.toFixed(
+                                                    2
+                                                )}`}
+                                            </p>
+                                        </div>
+                                        <div className='flex  justify-between'>
+                                            <p className='font-bold '>
+                                                VATable Sales:
+                                                {` ${totalAmount.toFixed(2)}`}
+                                            </p>
+                                            <p className='font-bold'>
+                                                Less: VAT: {vat.toFixed(2)}{' '}
+                                            </p>
+                                        </div>
+                                        <div className='flex  justify-end'>
+                                            <p className='font-bold'>
+                                                Amount: NET of VAT{' '}
+                                                {totalAmount.toFixed(2)}{' '}
+                                            </p>
+                                        </div>
+                                        <div className='flex justify-between'>
+                                            <p className='font-bold'>
+                                                VAT 12%: {vat.toFixed(2)}{' '}
+                                            </p>
+                                            <p className='font-bold '>
+                                                Total Amount Due:{' '}
+                                                {totalSalesVat.toFixed(2)}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <p
-                                className={`w-full text-center text-sm text-red-500 ${
-                                    totalSalesVat < 1500 &&
-                                    selectedItems.length > 0
-                                        ? ''
-                                        : 'invisible'
-                                }`}
-                            >
-                                {totalSalesVat < 1500 &&
-                                selectedItems.length > 0
-                                    ? 'Total amount must be 1500 or greater'
-                                    : ' '}
-                            </p>
-                            <p
-                                className={`w-full text-center text-sm text-red-500 ${
-                                    resError ? '' : 'invisible'
-                                }`}
-                            >
-                                {resError ? resError : ' '}
-                            </p>
+                            <div className='mb-1  w-full rounded-md rounded-t-none border-2 border-neutral'>
+                                <div className='just flex flex-col'>
+                                    <div className='flex w-full items-center bg-neutral px-2 py-1'>
+                                        <label className='text-center text-primary'>
+                                            Select Invoice status
+                                        </label>
+                                    </div>
+                                    <select
+                                        name='status'
+                                        value={status}
+                                        onChange={(event) => {
+                                            const value = event.target.value
 
-                            <button
-                                className={`  ${
-                                    isClientSelected && selectedItems.length > 0
-                                        ? 'cursor-pointer opacity-100'
-                                        : 'cursor-not-allowed opacity-50'
-                                } btn2 relative overflow-hidden rounded-bl-md rounded-br-md border-opacity-50  py-4 font-semibold uppercase leading-none tracking-wider`}
-                                type='submit'
-                            >
-                                <span className='absolute inset-0 bg-neutral '></span>
-                                <span className='absolute inset-0 flex items-center  justify-center text-primary'>
-                                    Save
-                                </span>
+                                            setStatus(value)
+                                        }}
+                                        className='select-primary select select-sm rounded-sm border-neutral'
+                                    >
+                                        <option
+                                            disabled
+                                            value='Invoice Status...'
+                                        >
+                                            Invoice Status...
+                                        </option>
+
+                                        <option>Pending</option>
+                                        <option>Pending Override</option>
+                                        <option>To follow</option>
+                                    </select>
+
+                                    {status === 'Select invoice status'
+                                        ? ErrorResponse(
+                                              'Pick a valid Invoice Status'
+                                          )
+                                        : null}
+                                </div>
+                            </div>
+                        </div>
+                        <p
+                            className={`w-full text-center text-sm text-red-500 ${
+                                totalSalesVat < 1500 && selectedItems.length > 0
+                                    ? ''
+                                    : 'invisible'
+                            }`}
+                        >
+                            {totalSalesVat < 1500 && selectedItems.length > 0
+                                ? 'Total amount must be 1500 or greater'
+                                : ' '}
+                        </p>
+                        <p
+                            className={`w-full text-center text-sm text-red-500 ${
+                                resError ? '' : 'invisible'
+                            }`}
+                        >
+                            {resError ? resError : ' '}
+                        </p>
+                        <button
+                            className={`  ${
+                                isClientSelected && selectedItems.length > 0
+                                    ? 'cursor-pointer opacity-100'
+                                    : 'cursor-not-allowed opacity-50'
+                            } btn2 relative overflow-hidden rounded-bl-md rounded-br-md border-opacity-50  py-4 font-semibold uppercase leading-none tracking-wider`}
+                            type='submit'
+                        >
+                            <span className='absolute inset-0 bg-neutral '></span>
+                            <span className='absolute inset-0 flex items-center  justify-center text-primary'>
                                 Save
-                            </button>
-                        </Form>
-                    )}
-                </Formik>
-                <div className='sat'>yo</div>
-            </div>
+                            </span>
+                            Save
+                        </button>
+                    </Form>
+                )}
+            </Formik>
+            {successAlert && <Alert text='Client saved!' />}
         </>
     )
 }
