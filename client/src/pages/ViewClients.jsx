@@ -10,7 +10,7 @@ const ViewClients = () => {
     const [invoiceDataRes, setInvoiceDataRes] = useState([])
 
     const handleSubmit = async () => {
-        const response = await fetch('http://localhost:8888/api/invoices', {
+        const response = await fetch(`${ipAddress}/api/invoices`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

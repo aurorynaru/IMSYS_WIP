@@ -29,16 +29,13 @@ const Registration = () => {
             }
         }
 
-        const savedUserResponse = await fetch(
-            'http://localhost:8888/register/user',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(values)
-            }
-        )
+        const savedUserResponse = await fetch(` ${ipAddress}/register/user`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(values)
+        })
 
         const savedUser = await savedUserResponse.json()
 
@@ -47,16 +44,13 @@ const Registration = () => {
                 username: values.username,
                 password: values.password
             }
-            const loggedInResponse = await fetch(
-                'http://localhost:8888/login',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(userData)
-                }
-            )
+            const loggedInResponse = await fetch(` ${ipAddress}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            })
 
             const loggedIn = await loggedInResponse.json()
 

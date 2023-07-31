@@ -113,16 +113,13 @@ const Invoice = ({ user }) => {
         values.cost = cost
         values.status = status
         console.log(values)
-        const savedUserResponse = await fetch(
-            'http://localhost:8888/create/invoice',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(values)
-            }
-        )
+        const savedUserResponse = await fetch(`${ipAddress}/create/invoice`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(values)
+        })
 
         const saved = await savedUserResponse.json()
         if (saved.error) {
@@ -183,7 +180,7 @@ const Invoice = ({ user }) => {
             const newQuery = query.replace(/\s/g, '')
             if (newQuery.length > 0) {
                 const response = await fetch(
-                    `http://localhost:8888/api/client/${query}`,
+                    `${ipAddress}/api/client/${query}`,
                     {
                         method: 'GET'
                     }
@@ -252,7 +249,7 @@ const Invoice = ({ user }) => {
             queryParameters.sortDesc = sortPageDesc
         }
 
-        const url = new URL('http://localhost:8888/api/search/')
+        const url = new URL(`${ipAddress}/api/search/`)
 
         for (const param in queryParameters) {
             url.searchParams.append(param, queryParameters[param])

@@ -79,7 +79,7 @@ const SupplierRegister = () => {
 
     const handleSubmit = async (values, onSubmitProps) => {
         const savedSupplierResponse = await fetch(
-            'http://localhost:8888/register/supplier',
+            `${ipAddress}/register/supplier`,
             {
                 method: 'POST',
                 headers: {

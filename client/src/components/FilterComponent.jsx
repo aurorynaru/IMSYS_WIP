@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { ipAddress } from '../functions/ip'
 
 const FilterComponent = ({ setOverrideUrl, filterNames }) => {
     const [address, setAddress] = useState('')
@@ -72,7 +73,7 @@ const FilterComponent = ({ setOverrideUrl, filterNames }) => {
             queryParameters.due_date = due_date
         }
 
-        const url = new URL('http://localhost:8888/api/searchInvoice/')
+        const url = new URL(`${ipAddress}/api/searchInvoice/`)
 
         for (const param in queryParameters) {
             url.searchParams.append(param, queryParameters[param])

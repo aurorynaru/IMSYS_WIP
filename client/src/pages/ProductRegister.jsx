@@ -8,6 +8,7 @@ import Navbar from '../components/Navbar'
 import { useDispatch } from 'react-redux'
 import { generateCustomID } from '../functions/randomID'
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
+import { ipAddress } from '../functions/ip'
 
 const ProductRegister = () => {
     const dispatch = useDispatch()
@@ -38,16 +39,13 @@ const ProductRegister = () => {
     }
     //use multer
     const handleSubmit = async (values, onSubmitProps) => {
-        const savedUserResponse = await fetch(
-            'http://localhost:8888/register/product',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(values)
-            }
-        )
+        const savedUserResponse = await fetch(`${ipAddress}/register/product`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(values)
+        })
 
         const savedProduct = await savedUserResponse.json()
         if (savedProduct.error) {
@@ -99,7 +97,7 @@ const ProductRegister = () => {
             const newQuery = query.replace(/\s/g, '')
             if (newQuery.length > 0) {
                 const response = await fetch(
-                    `http://localhost:8888/api/brand/${query}`,
+                    ` ${ipAddress}/api/brand/${query}`,
                     {
                         method: 'GET'
                     }
@@ -120,7 +118,7 @@ const ProductRegister = () => {
             const newQuery = query.replace(/\s/g, '')
             if (newQuery.length > 0) {
                 const response = await fetch(
-                    `http://localhost:8888/api/supplier/${query}`,
+                    `${ipAddress}/api/supplier/${query}`,
                     {
                         method: 'GET'
                     }

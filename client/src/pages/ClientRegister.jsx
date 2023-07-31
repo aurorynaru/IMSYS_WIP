@@ -115,7 +115,7 @@ const ClientRegister = () => {
         }
 
         const savedClientResponse = await fetch(
-            'http://localhost:8888/register/client',
+            `${ipAddress}/register/client`,
             {
                 method: 'POST',
                 headers: {
