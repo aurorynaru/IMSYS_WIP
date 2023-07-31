@@ -4,12 +4,15 @@ const invoiceSchema = mongoose.Schema(
     {
         invoice_number: { type: Number, required: true },
         client: { type: Schema.Types.ObjectId, ref: 'clients' },
+        clientName: { type: String },
         address: {
             type: String,
             required: true
         },
         items: { type: Array, required: true },
-        cost: { type: Array },
+        vatableSales: { type: Number },
+        totalAmountDue: { type: Number },
+        vat: { type: Number },
         date_created: {
             type: Date,
             required: true

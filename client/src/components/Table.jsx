@@ -20,6 +20,7 @@ const Table = (props) => {
     const body = props.selectedItems
 
     const {
+        setItemId,
         clickedItems,
         setTotalQuantity,
         setSelectedItems,
@@ -50,8 +51,14 @@ const Table = (props) => {
     }
     //EDIT HERE
     const editItem = (index) => {
-        const { amount, description, quantity, unit, unitPrice } = body[index]
+        const { amount, description, quantity, unit, unitPrice, id } =
+            body[index]
+        const clickedItem = clickedItems.find(
+            (item) => item.id === body[index].id
+        )
 
+        setItemId(id)
+        setTotalQuantity(clickedItem.quantity)
         setUnit(unit)
         setDescription(description)
         setQuantity(quantity)

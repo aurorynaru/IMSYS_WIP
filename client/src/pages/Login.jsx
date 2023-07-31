@@ -18,8 +18,14 @@ const Login = () => {
     }
 
     const schema = yup.object().shape({
-        username: yup.string().min(4).required('Required'),
-        password: yup.string().min(4).required('Required')
+        username: yup
+            .string()
+            .min(4, 'Must be at least 4 characters')
+            .required('Required'),
+        password: yup
+            .string()
+            .min(4, 'Must be at least 4 characters')
+            .required('Required')
     })
 
     const handleSubmit = async (values, onSubmitProps) => {
@@ -49,8 +55,7 @@ const Login = () => {
         }
     }
     return (
-        <div className=' min-h-screen'>
-            <Navbar />
+        <div>
             <Formik
                 initialValues={initialValues}
                 validationSchema={schema}
@@ -68,7 +73,7 @@ const Login = () => {
                     <Form
                         autoComplete='off'
                         onSubmit={handleSubmit}
-                        className='mx-auto my-5 flex w-1/3 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-5 shadow-lg'
+                        className='mx-auto my-5 flex min-w-full flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-5 shadow-lg'
                     >
                         <div className='flex flex-col gap-3 px-2 '>
                             <div className='flex flex-col text-black '>
@@ -80,7 +85,7 @@ const Login = () => {
                                 </label>
 
                                 <input
-                                    className={` input-primary input input-sm rounded-sm text-primary ${
+                                    className={` max-w-3/5 input-primary input input-sm w-3/5 rounded-sm text-primary ${
                                         errors.username && touched.username
                                             ? ` border-red-500 focus:ring-red-500`
                                             : ''
@@ -103,7 +108,7 @@ const Login = () => {
                                 </label>
 
                                 <input
-                                    className={`input-primary input input-sm rounded-sm text-primary ${
+                                    className={`max-w-3/5 input-primary input input-sm w-3/5 rounded-sm text-primary ${
                                         errors.password && touched.password
                                             ? ' border-red-500 focus:ring-red-500'
                                             : ''

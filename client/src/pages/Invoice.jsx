@@ -101,7 +101,7 @@ const Invoice = ({ user }) => {
             .required('Tin number is required')
     })
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values, onSubmitProps) => {
         setResError('')
         const cost = {}
 
@@ -124,19 +124,56 @@ const Invoice = ({ user }) => {
             }
         )
 
-        const savedProduct = await savedUserResponse.json()
-        if (savedProduct.error) {
-            setResError(savedProduct.error)
+        const saved = await savedUserResponse.json()
+        if (saved.error) {
+            setResError(saved.error)
         }
 
-        if (savedProduct) {
-            if (!savedProduct.error) {
+        if (saved) {
+            if (!saved.error) {
                 setSuccessAlert(true)
                 onSubmitProps.resetForm()
+                handleSearchProduct()
+                setSelectedItems([])
+                setSearchResultClient([])
+                setClickedItems([])
+
+                setMin(0)
+                setMax('')
+                setBrand('')
+                setDesc('')
+                setPage(1)
+                setLimit(10)
+
+                setItemsObject(null)
+                setQuantity(0)
+                setUnit('')
+                setDescription('')
+                setUnitPrice(0)
+                setAmount(0)
+                setItemId(null)
+
+                setResError('')
+                setErrorItem(false)
+                setTotalAmount(0)
+                setTotalSalesVat(0)
+                setVat(0)
+
+                setIsLoadingClient(false)
+                setSortPagePrice('')
+                setSortPageQuantity('')
+                setSortPageBrandName('')
+                setSortPageDesc('')
+                setBrandNameSearch('')
+                setDescSearch('')
+
+                setIsClientSelected(false)
+
+                setClientAddress([])
+                setTotalQuantity(0)
                 setTimeout(() => {
                     setSuccessAlert(false)
                 }, 3000)
-                navigate('/create/invoice')
             }
         }
     }
@@ -354,9 +391,8 @@ const Invoice = ({ user }) => {
     }
 
     return (
-        <>
+        <div className='relative '>
             <Navbar />
-
             <Formik
                 initialValues={initialValues}
                 validationSchema={Schema}
@@ -374,7 +410,7 @@ const Invoice = ({ user }) => {
                     <Form
                         autoComplete='off'
                         onSubmit={handleSubmit}
-                        className='mx-5 my-5 flex w-1/2 flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-3 shadow-lg'
+                        className=' mx-auto my-5 flex w-4/6 max-w-[720px] flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-3 shadow-lg'
                     >
                         <div className='flex flex-col gap-3 px-2'>
                             <h1 className='text-lg font-medium '>
@@ -1088,6 +1124,7 @@ const Invoice = ({ user }) => {
                                         setVat={setVat}
                                         setTotalQuantity={setTotalQuantity}
                                         clickedItems={clickedItems}
+                                        setItemId={setItemId}
                                     />
                                 ) : (
                                     <div className='mx-auto my-2 flex w-full items-center justify-center'>
@@ -1219,8 +1256,8 @@ const Invoice = ({ user }) => {
                     </Form>
                 )}
             </Formik>
-            {successAlert && <Alert text='Client saved!' />}
-        </>
+            {successAlert && <Alert text='Invoice saved!' />}
+        </div>
     )
 }
 

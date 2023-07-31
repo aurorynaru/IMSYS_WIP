@@ -144,7 +144,7 @@ const ClientRegister = () => {
     }
 
     return (
-        <div>
+        <div className='relative'>
             <Navbar />
             <Formik
                 initialValues={initialValues}

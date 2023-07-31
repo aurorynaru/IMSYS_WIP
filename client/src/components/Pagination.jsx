@@ -6,7 +6,6 @@ const Pagination = ({ totalPages, currentPage, setPage }) => {
     let startPage = Math.max(currentPage - range, 1)
     let endPage = Math.min(startPage + visiblePages - 1, totalPages)
 
-    // Adjust the range if the endPage is too close to the totalPages
     if (endPage - startPage + 1 < visiblePages) {
         startPage = Math.max(endPage - visiblePages + 1, 1)
     }

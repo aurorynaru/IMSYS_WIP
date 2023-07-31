@@ -51,7 +51,8 @@ export const searchClient = async (req, res) => {
                         terms: name.terms,
                         credit_limit: name.credit_limit,
                         tin: name.tin,
-                        credit_used: name.credit_used
+                        credit_used: name.credit_used,
+                        invoice: name.invoice
                     }
                 }
             })

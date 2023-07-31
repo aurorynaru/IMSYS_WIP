@@ -97,16 +97,23 @@ const Navbar = () => {
                             </svg>
                         </label>
                     </div>
-                    <div className='mx-2 flex-1 px-2'>
-                        <h1 className='text-md  cursor-pointer font-medium text-accent'>
-                            TEST
-                        </h1>
-                        <h1 className='text-md  cursor-pointer font-medium text-accent'>
-                            TESTING
-                        </h1>
-                        <h1 className='text-md  cursor-pointer font-medium text-accent'>
-                            TEST
-                        </h1>
+                    <div className='mx-2  flex-1 px-2'>
+                        <div
+                            className='flex'
+                            onClick={() => {
+                                navigate('/home')
+                            }}
+                        >
+                            <h1 className='text-md  cursor-pointer font-medium text-accent'>
+                                TEST
+                            </h1>
+                            <h1 className='text-md  cursor-pointer font-medium text-accent'>
+                                TESTING
+                            </h1>
+                            <h1 className='text-md  cursor-pointer font-medium text-accent'>
+                                TEST
+                            </h1>
+                        </div>
                     </div>
                     <div className='hidden flex-none lg:block'>
                         <ul className='menu menu-horizontal'>
@@ -331,6 +338,14 @@ const Navbar = () => {
                                                         <Menu.Item>
                                                             {({ active }) => (
                                                                 <button
+                                                                    onClick={() => {
+                                                                        console.log(
+                                                                            'sat'
+                                                                        )
+                                                                        navigate(
+                                                                            '/view/clients/'
+                                                                        )
+                                                                    }}
                                                                     className={`${
                                                                         active
                                                                             ? ' bg-neutral text-accent'
@@ -476,8 +491,9 @@ const Navbar = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <div className='flex-1 gap-3'>
-                                    <div className='transform duration-500 hover:translate-y-[-5px]'>
+                                //edit
+                                <div className='flex flex-1 gap-3'>
+                                    {/* { <div className='transform duration-500 hover:translate-y-[-5px]'>
                                         <button
                                             className='btn-secondary btn-sm btn whitespace-nowrap'
                                             onClick={() =>
@@ -494,7 +510,7 @@ const Navbar = () => {
                                         >
                                             Sign In
                                         </button>
-                                    </div>
+                                    </div>} */}
 
                                     <div className=''>
                                         <select
@@ -597,7 +613,11 @@ const Navbar = () => {
                                             >
                                                 <a>Register Client</a>
                                             </li>
-                                            <li>
+                                            <li
+                                                onClick={() => {
+                                                    navigate('/view/clients/')
+                                                }}
+                                            >
                                                 <a>View Clients</a>
                                             </li>
                                         </ul>
@@ -666,23 +686,24 @@ const Navbar = () => {
                             </div>
                         </div>
                     ) : (
-                        <div className='flex-1 gap-3'>
-                            <div className='transform duration-500 hover:translate-y-[-5px]'>
-                                <button
-                                    className='btn-secondary btn-sm btn whitespace-nowrap'
-                                    onClick={() => navigate('/register/user')}
-                                >
-                                    Register user
-                                </button>
-                            </div>
-                            <div className='transform  duration-500 hover:translate-y-[-5px]'>
-                                <button
-                                    className='btn-primary btn-sm btn whitespace-nowrap'
-                                    onClick={() => navigate('/login')}
-                                >
-                                    Sign In
-                                </button>
-                            </div>
+                        <div className='flex flex-1 flex-col gap-5'>
+                            {/* <div className='transform  duration-500 hover:translate-y-[-5px]'>
+                            <button
+                                className='btn-primary btn-sm btn whitespace-nowrap'
+                                onClick={() => navigate('/login')}
+                            >
+                                Sign In
+                            </button>
+                        </div>
+
+                        <div className='transform duration-500 hover:translate-y-[-5px]'>
+                            <button
+                                className='btn-secondary btn-sm btn whitespace-nowrap'
+                                onClick={() => navigate('/register/user')}
+                            >
+                                Register user
+                            </button>
+                        </div> */}
 
                             <div className=''>
                                 <select

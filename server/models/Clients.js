@@ -13,9 +13,7 @@ const clientSchema = mongoose.Schema(
         },
 
         credit_used: {
-            type: Number,
-            default: 0,
-            required: true
+            type: Number
         },
         terms: {
             type: Number,

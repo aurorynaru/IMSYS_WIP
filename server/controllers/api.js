@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb'
+import { Invoice } from '../models/Invoice.js'
 import { Product } from '../models/Products.js'
 import { Supplier } from '../models/Supplier.js'
 
@@ -54,6 +56,20 @@ export const searchSupplier = async (req, res) => {
         )
         console.log(suppliers)
         res.status(200).json(suppliers)
+    } catch (error) {
+        return res.status(409).json({ error: error.message })
+    }
+}
+
+export const searchInvoiceById = async (req, res) => {
+    try {
+        const invoiceArr = await Promise.all(
+            req.body.map(async (id) => {
+                return await Invoice.findById({ _id: new ObjectId(id) })
+            })
+        )
+
+        res.status(200).json(invoiceArr)
     } catch (error) {
         return res.status(409).json({ error: error.message })
     }

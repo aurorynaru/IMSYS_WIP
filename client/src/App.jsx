@@ -13,6 +13,8 @@ import Invoice from './pages/Invoice'
 import ProductRegister from './pages/ProductRegister'
 import ClientRegister from './pages/ClientRegister'
 import SupplierRegister from './pages/SupplierRegister'
+import Auth from './pages/Auth'
+import ViewClients from './pages/ViewClients'
 
 function App() {
     const isAuth = Boolean(useSelector((state) => state.token))
@@ -22,7 +24,10 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     <Route path='/' element={<Navigate to='/home' />} />
-                    <Route path='/home' element={<Home />} />
+                    <Route
+                        path='/home'
+                        element={isAuth ? <Home /> : <Auth />}
+                    />
                     <Route path='/login' element={<Login />} />
                     <Route
                         path='/register/product'
@@ -31,6 +36,10 @@ function App() {
                     <Route
                         path='/create/invoice'
                         element={<Invoice user={user} />}
+                    />
+                    <Route
+                        path='/view/clients/'
+                        element={isAuth ? <ViewClients /> : <Home />}
                     />
                     <Route path='/register/user' element={<Registration />} />
                     <Route

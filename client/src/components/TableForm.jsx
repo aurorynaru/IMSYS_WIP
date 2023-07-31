@@ -146,7 +146,7 @@ const TableForm = (props) => {
                                         obj.id = _id
                                         obj.description = description
                                         obj.price = price
-                                        console.log(obj)
+
                                         return [...prev, obj]
                                     } else {
                                         return prev

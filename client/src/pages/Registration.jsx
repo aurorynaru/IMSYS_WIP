@@ -75,15 +75,21 @@ const Registration = () => {
     }
 
     const Schema = yup.object().shape({
-        username: yup.string().min(3).required('required'),
-        password: yup.string().min(7).required('required'),
+        username: yup
+            .string()
+            .min(4, 'must be at least 4 characters')
+            .required('required'),
+        password: yup
+            .string()
+            .min(7, 'must be at least 7 characters')
+            .required('required'),
         last_name: yup
             .string()
-            .min(4, 'Last name must be at least 4 characters.')
+            .min(4, 'must be at least 4 characters.')
             .required('required'),
         first_name: yup
             .string()
-            .min(4, 'Last name must be at least 4 characters.')
+            .min(4, 'must be at least 4 characters.')
             .required('required'),
         confirmPassword: yup
             .string()
@@ -92,8 +98,7 @@ const Registration = () => {
     })
 
     return (
-        <>
-            <Navbar />
+        <div>
             <Formik
                 initialValues={initialValues}
                 validationSchema={Schema}
@@ -111,7 +116,7 @@ const Registration = () => {
                     <Form
                         autoComplete='off'
                         onSubmit={handleSubmit}
-                        className='mx-auto my-5 flex w-1/3 flex-col gap-3 rounded-md border-[2px] border-gray-600 bg-secondary  pt-5 shadow-lg'
+                        className='mx-auto my-5 flex min-w-full flex-col gap-1 rounded-md border-[2px] border-gray-600 bg-secondary pt-5 shadow-lg'
                     >
                         {console.log(errors)}
                         <div className='flex flex-col gap-1 px-2 '>
@@ -124,7 +129,7 @@ const Registration = () => {
                                 </label>
 
                                 <input
-                                    className={` input-primary input input-sm rounded-sm text-primary ${
+                                    className={`max-w-3/5 input-primary input input-sm w-3/5 rounded-sm text-primary ${
                                         errors.username && touched.username
                                             ? ` border-red-500 focus:ring-red-500`
                                             : ''
@@ -147,7 +152,7 @@ const Registration = () => {
                                 </label>
 
                                 <input
-                                    className={` input-primary input input-sm rounded-sm text-primary ${
+                                    className={`max-w-3/5 input-primary input input-sm w-3/5 rounded-sm text-primary ${
                                         errors.first_name && touched.first_name
                                             ? ` border-red-500 focus:ring-red-500`
                                             : ''
@@ -173,7 +178,7 @@ const Registration = () => {
                                 </label>
 
                                 <input
-                                    className={` input-primary input input-sm rounded-sm text-primary ${
+                                    className={`max-w-3/5 input-primary input input-sm w-3/5 rounded-sm text-primary ${
                                         errors.last_name && touched.last_name
                                             ? ` border-red-500 focus:ring-red-500`
                                             : ''
@@ -196,7 +201,7 @@ const Registration = () => {
                                 </label>
 
                                 <input
-                                    className={` input-primary input input-sm rounded-sm text-primary ${
+                                    className={`max-w-3/5 input-primary input input-sm w-3/5 rounded-sm text-primary ${
                                         errors.password && touched.password
                                             ? ' border-red-500 focus:ring-red-500'
                                             : ''
@@ -220,7 +225,7 @@ const Registration = () => {
                                 </label>
 
                                 <input
-                                    className={` input-primary input input-sm rounded-sm text-primary ${
+                                    className={`max-w-3/5 input-primary input input-sm w-3/5 rounded-sm text-primary ${
                                         errors.confirmPassword &&
                                         touched.confirmPassword
                                             ? ' border-red-500 focus:ring-red-500'
@@ -255,7 +260,7 @@ const Registration = () => {
                     </Form>
                 )}
             </Formik>
-        </>
+        </div>
     )
 }
 

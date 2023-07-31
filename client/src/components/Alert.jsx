@@ -2,7 +2,7 @@ import React from 'react'
 
 const Alert = ({ text, css = '' }) => {
     return (
-        <div className='flex justify-end'>
+        <div className='fixed bottom-4 right-4'>
             <div
                 className={`alert alert-success  w-fit whitespace-nowrap ${css} mx-5`}
             >
