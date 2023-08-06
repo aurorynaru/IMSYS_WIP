@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import ClientComponent from '../components/ClientComponent'
 import Navbar from '../components/Navbar'
 import TableComponent from '../components/TableComponent'
-
+import { ipAddress } from '../functions/ip'
 const ViewClients = () => {
     const [res, setRes] = useState([])
     const [query, setQuery] = useState('')
@@ -48,14 +48,14 @@ const ViewClients = () => {
                         }}
                     ></input>
 
-                    {/* {res && (
+                     {res && (
                         <ClientComponent
                             setRes={setRes}
                             setInvoiceData={setInvoiceData}
                             query={query}
                             res={res}
                         />
-                    )} */}
+                    )} 
                 </div>
                 <div className='mt-5 flex flex-col gap-4 '>
                     <div className='border-2  border-base-200'>

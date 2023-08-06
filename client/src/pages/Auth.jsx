@@ -13,7 +13,7 @@ const Auth = () => {
             <Navbar />
             {authToggle === 'login' ? (
                 <div
-                    className={`${width}   flex w-full justify-center gap-2 bg-base-100`}
+                    className={`${width}  flex-col flex w-3/6 mx-auto justify-center gap-2 bg-base-100`}
                 >
                     <Login />
                     <div className='flex items-end justify-start py-5 text-start'>
@@ -26,10 +26,10 @@ const Auth = () => {
                 </div>
             ) : (
                 <div
-                    className={`${width} flex w-full justify-center gap-2 bg-base-100`}
+                    className={`${width} flex  flex-col w-3/6 mx-auto justify-center bg-base-100`}
                 >
                     <Registration />
-                    <div className='flex items-end justify-start py-5 text-start'>
+                    <div className='flex items-end justify-start  text-start'>
                         <Toggle
                             label={'Login'}
                             func={setAuthToggle}

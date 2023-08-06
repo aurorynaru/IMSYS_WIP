@@ -10,7 +10,7 @@ import { useDispatch } from 'react-redux'
 import { generateCustomID } from '../functions/randomID'
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
 import Alert from '../components/Alert'
-
+import { ipAddress } from '../functions/ip'
 const SupplierRegister = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()

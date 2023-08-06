@@ -1,1 +1,1 @@
-export const ipAddress = 'http://localhost:8888'
+export const ipAddress = 'http://192.168.132.147:8888'

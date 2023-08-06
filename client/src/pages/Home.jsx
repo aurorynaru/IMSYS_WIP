@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar'
 import FilterComponent from '../components/FilterComponent'
 import TableComponent from '../components/TableComponent'
 import Pagination from '../components/Pagination'
-
+import { ipAddress } from '../functions/ip'
 const Home = () => {
     const dispatch = useDispatch()
     const invoice = useSelector((state) => state.invoice)

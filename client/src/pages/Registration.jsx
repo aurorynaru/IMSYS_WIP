@@ -8,6 +8,7 @@ import { errorText } from '../functions/errorText.jsx'
 import Navbar from '../components/Navbar'
 import { useDispatch } from 'react-redux'
 import { setLogin } from '../state'
+import { ipAddress } from '../functions/ip'
 
 const Registration = () => {
     const dispatch = useDispatch()
@@ -29,7 +30,7 @@ const Registration = () => {
             }
         }
 
-        const savedUserResponse = await fetch(` ${ipAddress}/register/user`, {
+        const savedUserResponse = await fetch(`${ipAddress}/register/user`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

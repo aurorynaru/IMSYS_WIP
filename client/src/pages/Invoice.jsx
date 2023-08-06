@@ -19,7 +19,7 @@ import Table from '../components/Table'
 import ComboBox from '../components/ComboBox'
 import ErrorResponse from '../functions/ErrorResponse'
 import Alert from '../components/Alert'
-
+import { ipAddress } from '../functions/ip'
 const currentDate = new Date()
 
 const Invoice = ({ user }) => {

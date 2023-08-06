@@ -8,6 +8,7 @@ import Navbar from '../components/Navbar.jsx'
 import { tailWindCss } from '../tailwindcss.js'
 import { tailwindError } from '../tailwindcss.js'
 import { errorText } from '../functions/errorText.jsx'
+import { ipAddress } from '../functions/ip.jsx'
 const Login = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -29,7 +30,7 @@ const Login = () => {
     })
 
     const handleSubmit = async (values, onSubmitProps) => {
-        const loggedInResponse = await fetch('http://localhost:8888/login', {
+        const loggedInResponse = await fetch(`${ipAddress}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
